@@ -42,9 +42,9 @@ class Sortie
     #[ORM\JoinColumn(nullable: false)]
     private ?Etat $etat = null;
 
-    #[ORM\ManyToOne(inversedBy: 'sortiesOrganisees')]
+    #[ORM\ManyToOne(inversedBy: 'sorties')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Participant $organisateur = null;
+    private ?Campus $siteOrganisateur = null;
 
     /**
      * @var Collection<int, Participant>
@@ -52,9 +52,9 @@ class Sortie
     #[ORM\ManyToMany(targetEntity: Participant::class, inversedBy: 'sorties')]
     private Collection $participants;
 
-    #[ORM\ManyToOne(inversedBy: 'sorties')]
+    #[ORM\ManyToOne(inversedBy: 'sortiesOrganisees')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Campus $siteOrganisateur = null;
+    private ?Participant $organisateur = null;
 
     public function __construct()
     {
@@ -162,14 +162,14 @@ class Sortie
         return $this;
     }
 
-    public function getOrganisateur(): ?Participant
+    public function getSiteOrganisateur(): ?Campus
     {
-        return $this->organisateur;
+        return $this->siteOrganisateur;
     }
 
-    public function setOrganisateur(?Participant $organisateur): static
+    public function setSiteOrganisateur(?Campus $siteOrganisateur): static
     {
-        $this->organisateur = $organisateur;
+        $this->siteOrganisateur = $siteOrganisateur;
 
         return $this;
     }
@@ -198,14 +198,14 @@ class Sortie
         return $this;
     }
 
-    public function getSiteOrganisateur(): ?Campus
+    public function getOrganisateur(): ?Participant
     {
-        return $this->siteOrganisateur;
+        return $this->organisateur;
     }
 
-    public function setSiteOrganisateur(?Campus $siteOrganisateur): static
+    public function setOrganisateur(?Participant $organisateur): static
     {
-        $this->siteOrganisateur = $siteOrganisateur;
+        $this->organisateur = $organisateur;
 
         return $this;
     }

@@ -71,12 +71,12 @@ class Campus
         return $this;
     }
 
-    public function removeSortie(Sortie $sortie): static
+    public function removeSortie(Sortie $sorty): static
     {
-        if ($this->sorties->removeElement($sortie)) {
+        if ($this->sorties->removeElement($sorty)) {
             // set the owning side to null (unless already changed)
-            if ($sortie->getSiteOrganisateur() === $this) {
-                $sortie->setSiteOrganisateur(null);
+            if ($sorty->getSiteOrganisateur() === $this) {
+                $sorty->setSiteOrganisateur(null);
             }
         }
 
