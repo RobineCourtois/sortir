@@ -1,0 +1,15 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ parent() }} | Profil {% endblock %}
+
+{% block body %}
+	<h1>Votre Profil</h1>
+	{{ form_row(form.prenom) }}
+	{{ form_row(form.nom) }}
+	{{ form_row(form.pseudo) }}
+	{{ form_row(form.email) }}
+	{{ form_row(form.password) }}
+	{{ form_row(form.telephone) }}
+
+	<a href="{{ path('profil_modifier') }}" class="btn btn-secondary">Modifier</a>
+{% endblock %}
