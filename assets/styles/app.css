@@ -1,3 +1,5 @@
 body {
-    background-color: skyblue;
+    background-color: #1a1a1a; /* gris sombre */
+    color: white;
+    min-height: 100vh;
 }
