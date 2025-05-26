@@ -16,6 +16,13 @@
                     <a class="nav-link" href="{{ path('main_home') }}">Accueil</a>
                 </li>
             </ul>
+            {% if app.user %}
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a href="{{ path('sortir_profil') }}">Mon Profil</a>
+                </li>
+            </ul>
+            {% endif %}
         </div>
     </div>
 </nav>

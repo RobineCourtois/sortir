@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ parent() }} | Profil {% endblock %}
+
+{% block body %}
+	<h1>Votre Profil</h1>
+	<ul>
+		<li>Nom : {{ participant.nom }}</li>
+		<li>Prénom : {{ participant.prenom }}</li>
+		<li>Pseudo : {{ participant.pseudo }}</li>
+		<li>Email : {{ participant.email }}</li>
+		<li>Campus : {{ participant.campus.nom }}</li>
+	</ul>
+{% endblock %}
