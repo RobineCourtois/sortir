@@ -23,7 +23,7 @@ class Sortie
     private ?\DateTimeImmutable $dateHeureDebut = null;
 
     #[ORM\Column(type: Types::TIME_IMMUTABLE)]
-    private ?\DateTimeImmutable $durée = null;
+    private ?\DateTimeImmutable $duree = null;
 
     #[ORM\Column]
     private ?\DateTimeImmutable $dateLimiteInscription = null;
@@ -90,14 +90,14 @@ class Sortie
         return $this;
     }
 
-    public function getDurée(): ?\DateTimeImmutable
+    public function getDuree(): ?\DateTimeImmutable
     {
-        return $this->durée;
+        return $this->duree;
     }
 
-    public function setDurée(\DateTimeImmutable $durée): static
+    public function setDuree(\DateTimeImmutable $duree): static
     {
-        $this->durée = $durée;
+        $this->duree = $duree;
 
         return $this;
     }

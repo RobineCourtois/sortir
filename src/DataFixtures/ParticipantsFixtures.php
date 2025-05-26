@@ -22,10 +22,14 @@ class ParticipantsFixtures extends Fixture
 		   $praticipant->setPassword("123456");
 		   $praticipant->setCampus($this->getReference('campus'.$faker->numberBetween(0,3), Campus::class));;
 		   $praticipant->setActif($faker->boolean(75));
+		   $manager->persist($praticipant);
+		   $this->addReference('participant'.$i, $praticipant);
 	   }
+
+	   $manager->flush();
     }
 
-	public function getDependencies()
+	public function getDependencies(): array
 	{
 		return [
 			CampusFixtures::class,
