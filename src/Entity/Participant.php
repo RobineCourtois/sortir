@@ -64,6 +64,9 @@ class Participant implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Sortie::class, mappedBy: 'organisateur')]
     private Collection $sortiesOrganisees;
 
+    #[ORM\Column(length: 50)]
+    private ?string $pseudo = null;
+
     public function __construct()
     {
 		$this->administrateur = false;
@@ -269,6 +272,18 @@ class Participant implements UserInterface, PasswordAuthenticatedUserInterface
                 $sortiesOrganisee->setOrganisateur(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getPseudo(): ?string
+    {
+        return $this->pseudo;
+    }
+
+    public function setPseudo(string $pseudo): static
+    {
+        $this->pseudo = $pseudo;
 
         return $this;
     }
