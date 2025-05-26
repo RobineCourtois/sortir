@@ -4,3 +4,17 @@ body {
     color: white;
     min-height: 100vh;
 }
+.actions a {
+    margin-right: 0.5rem;
+    text-decoration: none;
+    color: #0d6efd;
+}
+
+.actions a:hover {
+    text-decoration: underline;
+}
+.bg-green {
+    background-color: darkseagreen;
+    color: black;
+}
+
