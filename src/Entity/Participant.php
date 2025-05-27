@@ -6,11 +6,16 @@ use App\Repository\ParticipantRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ParticipantRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
+#[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_PSEUDO', fields: ['pseudo'])]
+#[UniqueEntity(fields: ['email'], message: "Email déjà utilisé")]
+#[UniqueEntity(fields: ['pseudo'], message: "Pseudo déjà utilisé")]
 class Participant implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -18,6 +23,8 @@ class Participant implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?int $id = null;
 
+	#[Assert\NotBlank]
+	#[Assert\Email]
     #[ORM\Column(length: 180)]
     private ?string $email = null;
 
@@ -30,19 +37,27 @@ class Participant implements UserInterface, PasswordAuthenticatedUserInterface
     /**
      * @var string The hashed password
      */
+	#[Assert\NotBlank]
+	#[Assert\Length(min: 6, max: 4096)]
     #[ORM\Column]
     private ?string $password = null;
 
+	#[Assert\NotBlank]
+	#[Assert\Length(min: 2, max: 50)]
     #[ORM\Column(length: 50)]
     private ?string $nom = null;
 
+	#[Assert\NotBlank]
+	#[Assert\Length(min: 2, max: 30)]
     #[ORM\Column(length: 30)]
     private ?string $prenom = null;
 
-    #[ORM\Column(length: 255)]
+
+	#[Assert\Length(min: 10, max: 15)]
+    #[ORM\Column(length: 15)]
     private ?string $telephone = null;
 
-    #[ORM\Column()]
+    #[ORM\Column]
     private ?bool $administrateur = null;
 
     #[ORM\Column]
@@ -60,6 +75,8 @@ class Participant implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Sortie::class, mappedBy: 'organisateur')]
     private Collection $sortiesOrganisees;
 
+	#[Assert\NotBlank]
+	#[Assert\Length(min: 3, max: 50)]
     #[ORM\Column(length: 50)]
     private ?string $pseudo = null;
 

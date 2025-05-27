@@ -37,6 +37,9 @@ final class ProfilController extends AbstractController
 		$form->handleRequest($request);
 
 		if ($form->isSubmitted() && $form->isValid()){
+
+//			dd($form->getData());
+
 			/** @var string $plainPassword */
 			$plainPassword = $form->get('plainPassword')->getData();
 
@@ -50,7 +53,7 @@ final class ProfilController extends AbstractController
 
 
 		return $this->render('profil/modifier.html.twig', [
-			"form" => $form->createView(),
+			"form" => $form,
 		]);
 	}
 }

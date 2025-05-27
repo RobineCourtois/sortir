@@ -31,6 +31,8 @@ class ProfilForm extends AbstractType
             ->add('campus', EntityType::class, [
                 'class' => Campus::class,
                 'choice_label' => 'nom',
+				'placeholder' => '-- Choisissez votre campus --',
+
             ])
 
         ;

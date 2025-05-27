@@ -25,12 +25,13 @@ class ParticipantsFixtures extends Fixture implements DependentFixtureInterface
 	   $admin->setPrenom("admin");
 	   $admin->setEmail("admin@eni.fr");
 	   $admin->setTelephone("0612345678");
-		$password = $this->passwordHasher->hashPassword($admin, '123456');
+	   $password = $this->passwordHasher->hashPassword($admin, '123456');
 	   $admin->setPassword($password);
 	   $admin->setRoles(['ROLE_ADMIN']);
 	   $admin->setCampus($this->getReference('campus0', Campus::class));
 	   $admin->setActif(true);
 	   $admin->setPseudo("admin");
+	   $admin->setAdministrateur(true);
 	   $manager->persist($admin);
 
 	   // Création des participants
