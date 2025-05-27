@@ -1,4 +1,114 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}SORTIR | Accueil {% endblock %}
+{% block title %}Accueil | Sortir.com{% endblock %}
 
+{% block body %}
+<h2 class="mb-4">Filtrer les sorties</h2>
+
+    <div class="card shadow-sm mb-5 form-background">
+        <div class="card-body">
+            {{ form_start(form) }}
+
+            <div class="row g-3">
+                <div class="col-md-3 mb-3">
+                    {{ form_label(form.campus) }}
+                    {{ form_widget(form.campus, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(form.campus) }}
+                </div>
+                <div class="col-md-3 mb-3">
+                    {{ form_label(form.search) }}
+                    {{ form_widget(form.search, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(form.search) }}
+                </div>
+                <div class="col-md-2 mb-3">
+                    {{ form_label(form.dateDebut) }}
+                    {{ form_widget(form.dateDebut, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(form.dateDebut) }}
+                </div>
+                <div class="col-md-2 mb-3">
+                    {{ form_label(form.dateFin) }}
+                    {{ form_widget(form.dateFin, {'attr': {'class': 'form-control'}}) }}
+                    {{ form_errors(form.dateFin) }}
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button class="btn btn-success">Rechercher</button>
+                </div>
+            </div>
+
+                <div class="col-md-3">
+                    <div class="form-group">
+                        {{ form_label(form.organisateur) }}
+                        {{ form_widget(form.organisateur, {'attr': {'class': 'form-check-input'}}) }}
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    <div class="form-group">
+                        {{ form_label(form.inscrit) }}
+                        {{ form_widget(form.inscrit, {'attr': {'class': 'form-check-input'}}) }}
+                    </div>
+                </div>
+
+                <div class="col-md-3">
+                    {{ form_label(form.non_inscrit) }}
+                    {{ form_widget(form.non_inscrit, {'attr': {'class': 'form-check-input'}}) }}
+                </div>
+
+                <div class="col-md-3">
+                    {{ form_label(form.terminees) }}
+                    {{ form_widget(form.terminees, {'attr': {'class': 'form-check-input'}}) }}
+                </div>
+            </div>
+
+            {{ form_end(form) }}
+        </div>
+    <h2 class="mb-4">Liste des sorties</h2>
+
+    <table class="table table-striped table-bordered">
+        <thead class="table-success">
+        <tr>
+            <th>Nom de la sortie</th>
+            <th>Date de la sortie</th>
+            <th>Clôture</th>
+            <th>Inscrit / Places</th>
+            <th>État</th>
+            <th>Inscrit</th>
+            <th>Organisateur</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for sortie in sorties %}
+            <tr>
+                <td>{{ sortie.nom }}</td>
+                <td>{{ sortie.dateSortie|date('d/m/Y H:i') }}</td>
+                <td>{{ sortie.dateCloture|date('d/m/Y H:i') }}</td>
+                <td>{{ sortie.inscrits }} / {{ sortie.placesMax }}</td>
+                <td>{{ sortie.etat }}</td>
+                <td>
+                    {% if sortie.utilisateurEstInscrit %}
+                        Oui
+                    {% else %}
+                        Non
+                    {% endif %}
+                </td>
+                <td>{{ sortie.organisateur.nom }}</td>
+                <td>
+                    <a href="{{ path('sortie_detail', {'id': sortie.id}) }}" class="btn btn-sm btn-primary">Voir</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="8" class="text-center">Aucune sortie trouvée.</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+
+{{ form_end(form) }}
+
+    <div class="text-end">
+       {#<a href="{{ path('sortie_creer') }}" class="btn btn-success">Créer une sortie</a> #}
+    </div>
+{% endblock %}

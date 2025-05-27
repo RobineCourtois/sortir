@@ -4,3 +4,10 @@ body {
     color: white;
     min-height: 100vh;
 }
+
+.form-background {
+    background-color:darkseagreen;
+    color: black;
+
+}
+

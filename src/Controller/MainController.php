@@ -2,7 +2,11 @@
 
 namespace App\Controller;
 
+use App\Form\FiltreSortieForm;
+use App\Repository\CampusRepository;
+use App\Repository\SortieRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -11,8 +15,22 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 final class MainController extends AbstractController
 {
     #[Route('/', name: 'main_home', methods: ['GET'])]
-    public function home(): Response
+    public function home(Request $request, SortieRepository $sortieRepository, CampusRepository $campusRepository): Response
     {
-        return $this->render('main/home.html.twig');
+        $form = $this->createForm(FiltreSortieForm::class, null, [
+            'campus_choices' => $campusRepository->findAll() // ou une liste transformée ['Nom campus' => id]
+        ]);
+
+        $form->handleRequest($request);
+
+        $filters = $form->getData();
+
+        $sorties = $sortieRepository->findBy(['etat' => 'Ouverte']);
+
+        return $this->render('main/home.html.twig', [
+            'form' => $form->createView(),
+            'sorties' => $sorties,
+        ]);
+
     }
 }
