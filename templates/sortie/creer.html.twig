@@ -1,0 +1,44 @@
+{% extends 'base.html.twig' %}
+
+
+{% block body %}
+<h1>Créer une sortie</h1>
+{{ form_start(form) }}
+<ul class="container">
+	<li class="row">
+		<div class="col-6">{{ form_row(form.nom) }} </div>
+		<div class="col-6">{{ form_row(form.siteOrganisateur) }}</div>
+	</li>
+	<li class="row">
+		<div class="col-6">{{ form_row(form.dateHeureDebut) }} </div>
+		<div class="col-6">{{ form_row(form.lieu) }}</div>
+	</li>
+	<li class="row">
+		<div class="col-6">{{ form_row(form.dateLimiteInscription) }} </div>
+		<div class="col-6">Rue</div>
+	</li>
+	<li class="row">
+		<div class="col-6">{{ form_row(form.nbInscriptionMax) }} </div>
+		<div class="col-6">Code postal</div>
+	</li>
+	<li class="row">
+		<div class="col-6">{{ form_row(form.duree) }} </div>
+		<div class="col-6">Latitude / Longitude</div>
+	</li>
+	<li>
+		<div class="col-12">{{ form_row(form.infosSortie) }}</div>
+	</li>
+</ul>
+<div>
+	<button class="btn btn-secondary">Enregistrer</button>
+	<button class="btn btn-primary">Publier</button>
+	<a href="{{ path('app_sortie') }}" class="btn btn-default">Retour à la liste</a>
+</div>
+
+{{ form_end(form) }}
+{% endblock %}
+
+{% block title %}
+Créer une sortie | {{ parent() }}
+{% endblock %}
+
