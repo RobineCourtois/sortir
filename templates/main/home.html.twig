@@ -3,7 +3,7 @@
 {% block title %}Accueil | Sortir.com{% endblock %}
 
 {% block body %}
-<h2 class="mb-4">Filtrer les sorties</h2>
+    <h2 class="mb-4">Filtrer les sorties</h2>
 
     <div class="card shadow-sm mb-5 form-background">
         <div class="card-body">
@@ -30,38 +30,37 @@
                     {{ form_widget(form.dateFin, {'attr': {'class': 'form-control'}}) }}
                     {{ form_errors(form.dateFin) }}
                 </div>
-                <div class="col-md-2 d-flex align-items-end">
-                    <button class="btn btn-success">Rechercher</button>
+                <div class="col-md-2 d-flex">
+                    <button type="submit" class="btn btn-success w-100">Rechercher</button>
                 </div>
             </div>
 
-                <div class="col-md-3">
-                    <div class="form-group">
-                        {{ form_label(form.organisateur) }}
+            <div class="row g-3 mt-3">
+                <div class="col d-flex flex-wrap gap-4">
+                    <div class="form-check">
                         {{ form_widget(form.organisateur, {'attr': {'class': 'form-check-input'}}) }}
+                        {{ form_label(form.organisateur, null, {'label_attr': {'class': 'form-check-label ms-1'}}) }}
                     </div>
-                </div>
-
-                <div class="col-md-3">
-                    <div class="form-group">
-                        {{ form_label(form.inscrit) }}
+                    <div class="form-check">
                         {{ form_widget(form.inscrit, {'attr': {'class': 'form-check-input'}}) }}
+                        {{ form_label(form.inscrit, null, {'label_attr': {'class': 'form-check-label ms-1'}}) }}
                     </div>
-                </div>
-
-                <div class="col-md-3">
-                    {{ form_label(form.non_inscrit) }}
-                    {{ form_widget(form.non_inscrit, {'attr': {'class': 'form-check-input'}}) }}
-                </div>
-
-                <div class="col-md-3">
-                    {{ form_label(form.terminees) }}
-                    {{ form_widget(form.terminees, {'attr': {'class': 'form-check-input'}}) }}
+                    <div class="form-check">
+                        {{ form_widget(form.non_inscrit, {'attr': {'class': 'form-check-input'}}) }}
+                        {{ form_label(form.non_inscrit, null, {'label_attr': {'class': 'form-check-label ms-1'}}) }}
+                    </div>
+                    <div class="form-check">
+                        {{ form_widget(form.terminees, {'attr': {'class': 'form-check-input'}}) }}
+                        {{ form_label(form.terminees, null, {'label_attr': {'class': 'form-check-label ms-1'}}) }}
+                    </div>
                 </div>
             </div>
 
             {{ form_end(form) }}
         </div>
+    </div>
+
+    {# Liste des sorties #}
     <h2 class="mb-4">Liste des sorties</h2>
 
     <table class="table table-striped table-bordered">
@@ -81,20 +80,14 @@
         {% for sortie in sorties %}
             <tr>
                 <td>{{ sortie.nom }}</td>
-                <td>{{ sortie.dateSortie|date('d/m/Y H:i') }}</td>
-                <td>{{ sortie.dateCloture|date('d/m/Y H:i') }}</td>
-                <td>{{ sortie.inscrits }} / {{ sortie.placesMax }}</td>
-                <td>{{ sortie.etat }}</td>
-                <td>
-                    {% if sortie.utilisateurEstInscrit %}
-                        Oui
-                    {% else %}
-                        Non
-                    {% endif %}
-                </td>
+                <td>{{ sortie.dateHeureDebut ? sortie.dateHeureDebut|date('d/m/Y') : '' }}</td>
+                <td>{{ sortie.dateLimiteInscription ? sortie.dateLimiteInscription|date('d/m/Y') : '' }}</td>
+                <td>{{ sortie.participants|length }} / {{ sortie.nbInscriptionMax ?: '∞' }}</td>
+                <td>{{ sortie.etat.libelle ?? sortie.etat }}</td>
+                <td>{{ sortie.estInscrit(participant) ? 'Oui' : 'Non' }}</td>
                 <td>{{ sortie.organisateur.nom }}</td>
                 <td>
-                    <a href="{{ path('sortie_detail', {'id': sortie.id}) }}" class="btn btn-sm btn-primary">Voir</a>
+
                 </td>
             </tr>
         {% else %}
@@ -105,10 +98,4 @@
         </tbody>
     </table>
 
-
-{{ form_end(form) }}
-
-    <div class="text-end">
-       {#<a href="{{ path('sortie_creer') }}" class="btn btn-success">Créer une sortie</a> #}
-    </div>
 {% endblock %}
