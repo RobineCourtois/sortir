@@ -198,15 +198,21 @@ class Sortie
         return $this;
     }
 
-    public function getOrganisateur(): ?Participant
+    public function getOrganisateur(): Participant
     {
         return $this->organisateur;
     }
 
-    public function setOrganisateur(?Participant $organisateur): static
+    public function setOrganisateur(Participant $organisateur): static
     {
         $this->organisateur = $organisateur;
 
         return $this;
     }
+
+    public function estInscrit(Participant $participant): bool
+    {
+        return $this->participants->contains($participant);
+    }
+
 }
