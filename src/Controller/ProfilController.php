@@ -4,19 +4,27 @@ namespace App\Controller;
 
 use App\Entity\Participant;
 use App\Form\ProfilForm;
+use App\Repository\ParticipantRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 
 final class ProfilController extends AbstractController
 {
-    #[Route('/profil/{id}', name: 'profil_consulter')]
-    public function consulter(Participant $participant): Response
+    #[Route('/profil/{id}', name: 'profil_consulter', requirements: ['id' => '\d+'], methods: ['GET'])]
+    public function consulter(int $id, ParticipantRepository $participantRepository): Response
     {
+		$participant = $participantRepository->find($id);
+
+		if (!$participant){
+			throw new NotFoundHttpException("Le participant n'existe pas");
+		}
+
         return $this->render('profil/consulter.html.twig', [
             "participant" => $participant,
         ]);
