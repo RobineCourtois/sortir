@@ -48,10 +48,6 @@ class Participant implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?bool $actif = null;
 
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?Campus $campus = null;
-
     /**
      * @var Collection<int, Sortie>
      */
@@ -63,6 +59,13 @@ class Participant implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[ORM\OneToMany(targetEntity: Sortie::class, mappedBy: 'organisateur')]
     private Collection $sortiesOrganisees;
+
+    #[ORM\Column(length: 50)]
+    private ?string $pseudo = null;
+
+    #[ORM\ManyToOne(inversedBy: 'participants')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Campus $campus = null;
 
     public function __construct()
     {
@@ -269,6 +272,18 @@ class Participant implements UserInterface, PasswordAuthenticatedUserInterface
                 $sortiesOrganisee->setOrganisateur(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getPseudo(): ?string
+    {
+        return $this->pseudo;
+    }
+
+    public function setPseudo(string $pseudo): static
+    {
+        $this->pseudo = $pseudo;
 
         return $this;
     }

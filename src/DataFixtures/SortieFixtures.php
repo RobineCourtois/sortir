@@ -2,47 +2,23 @@
 
 namespace App\DataFixtures;
 
+use App\Entity\Campus;
 use App\Entity\Etat;
 use App\Entity\Lieu;
 use App\Entity\Participant;
 use App\Entity\Sortie;
 use Doctrine\Bundle\FixturesBundle\Fixture;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Faker\Factory;
 
 
-class SortieFixtures extends Fixture
+class SortieFixtures extends Fixture implements DependentFixtureInterface
 {
     public function load(ObjectManager $em): void
     {
         $faker = Factory::create('fr_FR');
 
-        $etats = $em->getRepository(Etat::class)->findAll();
-        $organisateurs = $em->getRepository(Participant::class)->findAll();
-        $lieux = $em->getRepository(Lieu::class)->findAll();
-
-        // Sortie "test" fixe
-        $sortieTest = new Sortie();
-        $dateDebutTest = new \DateTimeImmutable('+7 days');
-        $dateLimiteTest = $dateDebutTest->modify('-3 days');
-        $sortieTest->setNom('Sortie Test Symfony');
-        $sortieTest->setDateHeureDebut($dateDebutTest);
-        $sortieTest->setDateLimiteInscription($dateLimiteTest);
-        $sortieTest->setNbInscriptionMax(20);
-        $sortieTest->setInfosSortie('Sortie créée pour les tests.');
-        $sortieTest->setOrganisateur($faker->randomElement($organisateurs));
-        $sortieTest->setEtat($faker->randomElement($etats));
-        $sortieTest->setLieu($faker->randomElement($lieux));
-        $sortieTest->setDuree($faker->numberBetween(30, 180));
-
-        if (method_exists($sortieTest, 'addParticipant')) {
-            $participantsInscrits = $faker->randomElements($organisateurs, $faker->numberBetween(1, 5));
-            foreach ($participantsInscrits as $participant) {
-                $sortieTest->addParticipant($participant);
-            }
-        }
-
-        $em->persist($sortieTest);
 
         // Génération aléatoire de sorties
         for ($i = 0; $i < 20; $i++) {
@@ -56,16 +32,14 @@ class SortieFixtures extends Fixture
             $sortie->setDateLimiteInscription($dateLimite);
             $sortie->setNbInscriptionMax($faker->numberBetween(5, 30));
             $sortie->setInfosSortie($faker->paragraph(2));
-            $sortie->setOrganisateur($faker->randomElement($organisateurs));
-            $sortie->setEtat($faker->randomElement($etats));
-            $sortie->setLieu($faker->randomElement($lieux));
+            $sortie->setOrganisateur($this->getReference('participant' . $faker->numberBetween(0, 49),Participant::class));
+            $sortie->setEtat($this->getReference('etat' . $faker->numberBetween(0, 6), Etat::class));
+            $sortie->setLieu($this->getReference('lieu' . $faker->numberBetween(0, 19), Lieu::class));
             $sortie->setDuree($faker->numberBetween(30, 180));
+            $sortie->setSiteOrganisateur($this->getReference('campus' . $faker->numberBetween(0, 3), Campus::class));
 
-            if (method_exists($sortie, 'addParticipant')) {
-                $participantsInscrits = $faker->randomElements($organisateurs, $faker->numberBetween(1, 5));
-                foreach ($participantsInscrits as $participant) {
-                    $sortie->addParticipant($participant);
-                }
+            for ($j = 0; $j < $faker->numberBetween(0, 15); $j++) {
+                $sortie->addParticipant($this->getReference('participant' . $faker->numberBetween(0, 49), Participant::class));
             }
 
             $em->persist($sortie);
@@ -77,6 +51,7 @@ class SortieFixtures extends Fixture
     public function getDependencies(): array
     {
         return [
+            EtatFixtures::class,
             VilleFixtures::class,
             LieuFixtures::class,
         ];

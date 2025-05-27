@@ -15,7 +15,7 @@ class ParticipantsFixtures extends Fixture
 	}
     public function load(ObjectManager $manager): void
     {
-       $faker = \Faker\Factory::create();
+       $faker = \Faker\Factory::create('fr_FR');
 
 
 	   // Création de l'admin
@@ -29,6 +29,7 @@ class ParticipantsFixtures extends Fixture
 	   $admin->setRoles(['ROLE_ADMIN']);
 	   $admin->setCampus($this->getReference('campus0', Campus::class));
 	   $admin->setActif(true);
+	   $admin->setPseudo("admin");
 	   $manager->persist($admin);
 
 	   // Création des participants
@@ -36,6 +37,7 @@ class ParticipantsFixtures extends Fixture
 		   $praticipant = new Participant();
 		   $praticipant->setNom($faker->lastName);
 		   $praticipant->setPrenom($faker->firstName);
+		   $praticipant->setPseudo("paricipant$i");
 		   $praticipant->setEmail("participant$i@eni.fr");
 		   $praticipant->setTelephone($faker->phoneNumber);
 		   $password = $this->passwordHasher->hashPassword($praticipant, '123456');
