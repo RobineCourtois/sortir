@@ -5,10 +5,11 @@ namespace App\DataFixtures;
 use App\Entity\Campus;
 use App\Entity\Participant;
 use Doctrine\Bundle\FixturesBundle\Fixture;
+use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
-class ParticipantsFixtures extends Fixture
+class ParticipantsFixtures extends Fixture implements DependentFixtureInterface
 {
 	public function __construct(private readonly UserPasswordHasherInterface $passwordHasher)
 	{
@@ -24,12 +25,13 @@ class ParticipantsFixtures extends Fixture
 	   $admin->setPrenom("admin");
 	   $admin->setEmail("admin@eni.fr");
 	   $admin->setTelephone("0612345678");
-		$password = $this->passwordHasher->hashPassword($admin, '123456');
+	   $password = $this->passwordHasher->hashPassword($admin, '123456');
 	   $admin->setPassword($password);
 	   $admin->setRoles(['ROLE_ADMIN']);
 	   $admin->setCampus($this->getReference('campus0', Campus::class));
 	   $admin->setActif(true);
 	   $admin->setPseudo("admin");
+	   $admin->setAdministrateur(true);
 	   $manager->persist($admin);
 
 	   // Création des participants
