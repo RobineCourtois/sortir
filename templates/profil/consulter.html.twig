@@ -3,13 +3,13 @@
 {% block title %}{{ parent() }} | Profil {% endblock %}
 
 {% block body %}
-	<h1>Votre Profil</h1>
+	<h1>{{ participant.pseudo }}</h1>
 	<ul>
-		<li>Nom : {{ participant.nom }}</li>
-		<li>Prénom : {{ participant.prenom }}</li>
-		<li>Pseudo : {{ participant.pseudo }}</li>
-		<li>Email : {{ participant.email }}</li>
 		<li>Campus : {{ participant.campus.nom }}</li>
+		<li>Prénom : {{ participant.prenom }}</li>
+		<li>Nom : {{ participant.nom }}</li>
+		<li>Telephone  : {{ participant.telephone }}</li>
+		<li>Email : {{ participant.email }}</li>
 	</ul>
 	<a href="{{ path('profil_modifier') }}" class="btn btn-secondary">Modifier</a>
 {% endblock %}

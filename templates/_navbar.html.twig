@@ -10,19 +10,20 @@
             <span class="navbar-toggler-icon"></span>
         </button>
 
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <div class="collapse navbar-collapse justify-content-end" id="navbarSupportedContent">
             <ul class="navbar-nav mr-auto">
                 <li class="nav-item">
                     <a class="nav-link" href="{{ path('main_home') }}">Accueil</a>
                 </li>
-            </ul>
-            {% if app.user %}
-            <ul class="navbar-nav ml-auto">
+                {% if app.user %}
                 <li class="nav-item">
-                    <a href="{{ path('profil_consulter') }}">Mon Profil</a>
+                    <a class="nav-link" href="{{ path('profil_modifier') }}">Mon Profil</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{{ path('profil_modifier') }}">Se déconnecter</a>
+                </li>
+                {% endif %}
             </ul>
-            {% endif %}
         </div>
     </div>
 </nav>

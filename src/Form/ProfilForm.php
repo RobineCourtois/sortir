@@ -7,6 +7,8 @@ use App\Entity\Participant;
 use App\Entity\Sortie;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\PasswordType;
+use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -16,26 +18,21 @@ class ProfilForm extends AbstractType
     {
         $builder
             ->add('email')
-            ->add('roles')
-            ->add('password', null, [ //TODO: ne pas afficher le hash
-				'label' => 'Mot de passe',
-
-			])
             ->add('nom')
             ->add('prenom')
             ->add('telephone')
-            ->add('administrateur')
-            ->add('actif')
             ->add('pseudo')
+			->add('plainPassword', RepeatedType::class , [
+				'type' => PasswordType::class,
+				'first_options'  => ['label' => 'Mot de passe', 'hash_property_path' => 'password'],
+				'second_options' => ['label' => 'Confirmer le mot de passe'],
+				'mapped' => false,
+			])
             ->add('campus', EntityType::class, [
                 'class' => Campus::class,
-                'choice_label' => 'id',
+                'choice_label' => 'nom',
             ])
-            ->add('sorties', EntityType::class, [
-                'class' => Sortie::class,
-                'choice_label' => 'id',
-                'multiple' => true,
-            ])
+
         ;
     }
 
