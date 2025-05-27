@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Form\FiltreSortieForm;
 use App\Repository\CampusRepository;
 use App\Repository\SortieRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -14,17 +15,20 @@ final class MainController extends AbstractController
     #[Route('/', name: 'main_home', methods: ['GET'])]
     public function home(Request $request, SortieRepository $sortieRepository, CampusRepository $campusRepository): Response
     {
-        $user = $this->getUser();
-        $campusList = $campusRepository->findAll();
+        $form = $this->createForm(FiltreSortieForm::class, null, [
+            'campus_choices' => $campusRepository->findAll() // ou une liste transformée ['Nom campus' => id]
+        ]);
 
-        //todo : faire un tri par état
-        $sorties = $sortieRepository->findAll();
+        $form->handleRequest($request);
 
+        $filters = $form->getData();
+
+        $sorties = $sortieRepository->findBy(['etat' => 'Ouverte']);
 
         return $this->render('main/home.html.twig', [
+            'form' => $form->createView(),
             'sorties' => $sorties,
-            'campusList' => $campusList,
-            'user' => $user,
         ]);
+
     }
 }
