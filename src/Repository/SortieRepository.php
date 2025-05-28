@@ -42,7 +42,7 @@ class SortieRepository extends ServiceEntityRepository
 //            ->getOneOrNullResult()
 //        ;
 //    }
-    public function findFiltered(?Participant $participant, array $filters): array
+    public function findFiltered( Participant $participant, array $filters): array
     {
         $queryBuilder = $this->createQueryBuilder('sortie')
             ->leftJoin('sortie.organisateur', 'organisateur')
