@@ -18,9 +18,12 @@ final class MainController extends AbstractController
     public function home(Request $request, SortieRepository $sortieRepository, CampusRepository $campusRepository): Response
     {
         // Création du formulaire avec choix des campus
-        $form = $this->createForm(FiltreSortieForm::class, null, [
+        $form = $this->createForm(FiltreSortieForm::class, [
+            'campus' => $this->getUser()->getCampus(), // valeur par défaut
+        ], [
             'campus_choices' => $campusRepository->findAll()
         ]);
+
 
         $form->handleRequest($request);
 
