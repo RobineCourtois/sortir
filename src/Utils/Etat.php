@@ -9,7 +9,7 @@ enum Etat: string
 	case CLOTUREE = 'Clôturée';
 	case EN_COURS = 'En cours';
 	case TERMINEE = 'Terminée';
-	case ANNULEE = 'Annulée';
+	case ANNULEE = 'Anuulée';
 	case HISTORISEE = 'Historisée';
 
 }
