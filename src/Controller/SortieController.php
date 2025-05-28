@@ -78,6 +78,9 @@ final class SortieController extends AbstractController
 	#[Route('/sortie/{id}/supprimer/{token}', name: 'sortie_supprimer', requirements: ['id' => '\d+'], methods: ['GET'])]
 	public function supprimerSortie(Sortie $sortie, string $token, EntityManagerInterface $em): Response
 	{
+		if (!$this->isGranted('ROLE_ADMIN') and $sortie->getOrganisateur() !== $this->getUser()){
+			throw $this->createAccessDeniedException("Vous n'avez pas le droit de supprimer cette sortie");
+		}
 		if($this->isCsrfTokenValid('supprimer-sortie-'.$sortie->getId(), $token)){
 			$em->remove($sortie);
 			$em->flush();
@@ -87,5 +90,18 @@ final class SortieController extends AbstractController
 		$this->addFlash("danger", "Une erreur est survenue lors de la suppression de la sortie !");
 		return $this->redirectToRoute('sortie_modifier', ['id' => $sortie->getId()]);
 
+	}
+
+	#[Route('/sortie/{id}/annuler', name: 'sortie_annuler', requirements: ['id' => '\d+'], methods: ['GET'])]
+	public function annulerSortie(Sortie $sortie, EntityManagerInterface $em): Response
+	{
+		if ($sortie->getEtat() !== Etat::OUVERTE){
+			throw $this->createAccessDeniedException("Vous ne pouvez annuler une sortie que si elle est publiée et non commencée");
+		}
+		$sortie->setEtat(Etat::ANNULEE);
+		$em->persist($sortie);
+		$em->flush();
+		$this->addFlash("success", "Sortie annulée avec succès !");
+		return $this->redirectToRoute('main_home');
 	}
 }
