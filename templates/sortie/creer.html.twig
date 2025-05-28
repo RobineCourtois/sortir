@@ -1,4 +1,6 @@
 {% extends 'base.html.twig' %}
+{% form_theme form 'bootstrap_5_layout.html.twig' %}
+
 
 
 {% block body %}
@@ -30,8 +32,8 @@
 	</li>
 </ul>
 <div>
-	<button class="btn btn-secondary">Enregistrer</button>
-	<button class="btn btn-primary">Publier</button>
+	{{ form_row(form.enregistrer) }}
+	{{ form_row(form.publier) }}
 	<a href="{{ path('main_home') }}" class="btn btn-default">Retour à la liste</a>
 </div>
 
