@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\SortieRepository;
+use App\Utils\Etat;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -40,10 +41,6 @@ class Sortie
 
     #[ORM\ManyToOne(inversedBy: 'sorties')]
     #[ORM\JoinColumn(nullable: false)]
-    private ?Etat $etat = null;
-
-    #[ORM\ManyToOne(inversedBy: 'sorties')]
-    #[ORM\JoinColumn(nullable: false)]
     private ?Campus $siteOrganisateur = null;
 
     /**
@@ -55,6 +52,9 @@ class Sortie
     #[ORM\ManyToOne(inversedBy: 'sortiesOrganisees')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Participant $organisateur = null;
+
+    #[ORM\Column(enumType: Etat::class)]
+    private ?Etat $etat = null;
 
     public function __construct()
     {
@@ -150,18 +150,6 @@ class Sortie
         return $this;
     }
 
-    public function getEtat(): ?Etat
-    {
-        return $this->etat;
-    }
-
-    public function setEtat(?Etat $etat): static
-    {
-        $this->etat = $etat;
-
-        return $this;
-    }
-
     public function getSiteOrganisateur(): ?Campus
     {
         return $this->siteOrganisateur;
@@ -213,6 +201,18 @@ class Sortie
     public function estInscrit(Participant $participant): bool
     {
         return $this->participants->contains($participant);
+    }
+
+    public function getEtat(): ?Etat
+    {
+        return $this->etat;
+    }
+
+    public function setEtat(Etat $etat): static
+    {
+        $this->etat = $etat;
+
+        return $this;
     }
 
 }

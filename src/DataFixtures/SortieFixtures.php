@@ -3,10 +3,10 @@
 namespace App\DataFixtures;
 
 use App\Entity\Campus;
-use App\Entity\Etat;
 use App\Entity\Lieu;
 use App\Entity\Participant;
 use App\Entity\Sortie;
+use App\Utils\Etat;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
@@ -33,7 +33,7 @@ class SortieFixtures extends Fixture implements DependentFixtureInterface
             $sortie->setNbInscriptionMax($faker->numberBetween(5, 30));
             $sortie->setInfosSortie($faker->paragraph(2));
             $sortie->setOrganisateur($this->getReference('participant' . $faker->numberBetween(0, 49),Participant::class));
-            $sortie->setEtat($this->getReference('etat' . $faker->numberBetween(0, 6), Etat::class));
+            $sortie->setEtat($faker->randomElement(Etat::cases()));;
             $sortie->setLieu($this->getReference('lieu' . $faker->numberBetween(0, 19), Lieu::class));
             $sortie->setDuree($faker->numberBetween(30, 180));
             $sortie->setSiteOrganisateur($this->getReference('campus' . $faker->numberBetween(0, 3), Campus::class));
@@ -51,7 +51,6 @@ class SortieFixtures extends Fixture implements DependentFixtureInterface
     public function getDependencies(): array
     {
         return [
-            EtatFixtures::class,
             VilleFixtures::class,
             LieuFixtures::class,
         ];

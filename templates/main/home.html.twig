@@ -83,7 +83,7 @@
                 <td>{{ sortie.dateHeureDebut ? sortie.dateHeureDebut|date('d/m/Y') : '' }}</td>
                 <td>{{ sortie.dateLimiteInscription ? sortie.dateLimiteInscription|date('d/m/Y') : '' }}</td>
                 <td>{{ sortie.participants|length }} / {{ sortie.nbInscriptionMax ?: '∞' }}</td>
-                <td>{{ sortie.etat.libelle ?? sortie.etat }}</td>
+                <td>{{ sortie.etat.value ?? sortie.etat }}</td>
                 <td>{{ sortie.estInscrit(participant) ? 'Oui' : 'Non' }}</td>
                 <td>{{ sortie.organisateur.nom }}</td>
                 <td>
