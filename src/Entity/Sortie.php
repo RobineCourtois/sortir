@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: SortieRepository::class)]
 class Sortie
@@ -17,15 +18,23 @@ class Sortie
     #[ORM\Column]
     private ?int $id = null;
 
+	#[Assert\NotBlank(message: "Merci de renseigner le nom de la sortie")]
     #[ORM\Column(length: 255)]
     private ?string $nom = null;
 
+
+	#[Assert\GreaterThan(value: new \DateTimeImmutable('now'), message: "La date de début de sortie doit être future")]
     #[ORM\Column]
     private ?\DateTimeImmutable $dateHeureDebut = null;
 
+
+	#[Assert\PositiveOrZero]
     #[ORM\Column(type: Types::INTEGER)]
     private ?int $duree = null;
 
+
+	#[Assert\LessThanOrEqual(propertyPath: "dateHeureDebut" , message: "La date limite d'inscription doit être inférieure ou égale à la date de début de sortie")]
+	#[Assert\GreaterThanOrEqual(new \DateTimeImmutable('now'), message: "La date limite d'inscription doit être future")]
     #[ORM\Column]
     private ?\DateTimeImmutable $dateLimiteInscription = null;
 

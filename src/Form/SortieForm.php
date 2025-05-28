@@ -3,12 +3,15 @@
 namespace App\Form;
 
 use App\Entity\Campus;
-use App\Entity\Etat;
 use App\Entity\Lieu;
 use App\Entity\Participant;
 use App\Entity\Sortie;
+
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\DateType;
+use Symfony\Component\Form\Extension\Core\Type\SubmitType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -21,15 +24,18 @@ class SortieForm extends AbstractType
             ->add('nom', null, [
 				'label' => 'Nom de la sortie '
 			])
-            ->add('dateHeureDebut', null, [
-                'widget' => 'single_text',
-				'label' => 'Date et heure de la sortie'
+            ->add('dateHeureDebut', DateTimeType::class, [
+				'label' => 'Date et heure de la sortie',
+				'widget' => 'single_text',
+				'input' => 'datetime_immutable',
             ])
             ->add('duree', null, [
 				'label' => 'Durée (en minutes)'
 			])
-            ->add('dateLimiteInscription', null, [
+            ->add('dateLimiteInscription', DateTimeType::class, [
+				'label' => 'Date limite d\'inscription',
                 'widget' => 'single_text',
+				'input' => 'datetime_immutable',
             ])
             ->add('nbInscriptionMax', null, [
 				'label' => 'Nombre de places'
@@ -46,6 +52,12 @@ class SortieForm extends AbstractType
                 'choice_label' => 'nom',
 				'label' => 'Campus'
             ])
+			->add('enregistrer', SubmitType::class, [
+				'label' => 'Enregistrer',
+			])
+			->add('publier', SubmitType::class, [
+				'label' => 'Publier',
+			])
         ;
     }
 
