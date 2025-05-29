@@ -13,7 +13,7 @@
         {% endfor %}
     {% endfor %}
 
-    <h2 class="mb-4">Filtrer les sorties</h2>
+        <h2 class="mb-4">Filtrer les sorties</h2>
 
     <div class="card shadow-sm mb-5 form-background">
         <div class="card-body">
@@ -40,9 +40,14 @@
                     {{ form_widget(form.dateFin, {'attr': {'class': 'form-control'}}) }}
                     {{ form_errors(form.dateFin) }}
                 </div>
-                <div class="col-md-2 d-flex">
-                    <button type="submit" class="btn btn-success w-100">Rechercher</button>
+                <div class="col-md-2 d-flex gap-2">
+                    <button type="submit" class="btn btn-success ">Rechercher</button>
+                    <a href="{{ path('main_home') }}" class="btn btn-outline-secondary btn-sm w-auto d-flex align-items-center">
+                        <i class="bi bi-arrow-repeat me-1"></i>
+                    </a>
                 </div>
+
+
             </div>
 
             <div class="row g-3 mt-3">
@@ -93,22 +98,34 @@
                 <td>{{ sortie.dateHeureDebut ? sortie.dateHeureDebut|date('d/m/Y') : '' }}</td>
                 <td>{{ sortie.dateLimiteInscription ? sortie.dateLimiteInscription|date('d/m/Y') : '' }}</td>
                 <td>{{ sortie.participants|length }} / {{ sortie.nbInscriptionMax ?: '∞' }}</td>
-                <td>{{ sortie.etat.value }}</td>
+                <td>{{ sortie.etat.value ?? sortie.etat }}</td>
                 <td>{{ sortie.estInscrit(participant) ? 'Oui' : 'Non' }}</td>
-                <td>{{ sortie.organisateur.nom }}</td>
+                <td>{{ sortie.organisateur.pseudo }}</td>
                 <td>
+                    <a href="{{ path('sortie_details', {id: sortie.id}) }}" class="btn btn-info btn-sm">Détails</a>
+
                     {% if sortie.etat == constant('App\\Utils\\Etat::OUVERTE') %}
-                        {% if not sortie.participants.contains(app.user) %}
-                            <a href="{{ path('sortie_inscrire', {id: sortie.id}) }}" class="btn btn-success btn-sm">S'inscrire</a>
-                        {% else %}
-                            <a href="{{ path('sortie_desister', {id: sortie.id}) }}" class="btn btn-warning btn-sm">Se désister</a>
+                        {% set inscriptionPossible = sortie.dateLimiteInscription > "now"|date('Y-m-d H:i') and (sortie.nbInscriptionMax > sortie.participants|length or sortie.nbInscriptionMax is null) %}
+
+                        {% if not sortie.estInscrit(participant) and inscriptionPossible %}
+                            <form action="{{ path('sortie_inscrire', {'id': sortie.id}) }}" method="post" style="display:inline;">
+                                <button type="submit" class="btn btn-success btn-sm">S'inscrire</button>
+                            </form>
+                        {% elseif sortie.estInscrit(participant) and sortie.dateHeureDebut > "now"|date('Y-m-d H:i') %}
+                            <form action="{{ path('sortie_desister', {'id': sortie.id}) }}" method="post" style="display:inline;">
+                                <button type="submit" class="btn btn-warning btn-sm">Se désister</button>
+                            </form>
                         {% endif %}
                     {% endif %}
 
-                    <a href="{{ path('sortie_details', {id: sortie.id}) }}" class="btn btn-info btn-sm">Détails</a>
+                    {% if sortie.organisateur == app.user or app.user.administrateur %}
+                        <a href="{{ path('sortie_modifier', {'id': sortie.id}) }}" class="btn btn-primary btn-sm">Modifier</a>
+                    {% endif %}
                 </td>
+
+
             </tr>
-                     {% else %}
+        {% else %}
             <tr>
                 <td colspan="8" class="text-center">Aucune sortie trouvée.</td>
             </tr>

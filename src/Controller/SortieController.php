@@ -5,11 +5,9 @@ namespace App\Controller;
 use App\Entity\Participant;
 use App\Entity\Sortie;
 use App\Form\SortieForm;
-use App\Repository\SortieRepository;
 use App\Utils\Etat;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -34,6 +32,7 @@ final class SortieController extends AbstractController
 			$em->persist($sortie);
 			$em->flush();
 
+			$this->addFlash("success", "sortie créée avec succès !");
 			return $this->redirectToRoute('main_home');
 		}
 
@@ -42,45 +41,53 @@ final class SortieController extends AbstractController
 			'form' => $form,
 		]);
 	}
-    #[Route('/sortie/{id}/inscrire', name: 'sortie_inscrire')]
-    public function inscrire(Sortie $sortie, EntityManagerInterface $em, Security $security): Response
-    {
-        $participant = $security->getUser();
 
-        if (!$participant instanceof Participant) {
-            throw new \LogicException('Utilisateur non connecté ou invalide.');
-        }
+	#[Route('/sortie/{id}/modifier', name: 'sortie_modifier', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])]
+	public function modifierSortie(Request $request, Sortie $sortie, EntityManagerInterface $em): Response
+	{
 
-        if (!$sortie->getParticipants()->contains($participant)) {
-            $sortie->addParticipant($participant);
-            $em->flush();
-            $this->addFlash('success', '✅ Vous êtes bien inscrit(e) à la sortie.');
-        }
+		if ($sortie->getOrganisateur() !== $this->getUser() and !$this->isGranted('ROLE_ADMIN')){
+			throw $this->createAccessDeniedException("Vous n'avez pas le droit de modifier cette sortie");
+		}
+		if ($sortie->getEtat() === Etat::OUVERTE){
+			throw $this->createAccessDeniedException("Une sortie ne peux pas être modifiée une fois publiée");
+		}
 
-        return $this->redirectToRoute('main_home');
-    }
+		$form = $this->createForm(SortieForm::class, $sortie);
+		$form->handleRequest($request);
 
+		if ($form->isSubmitted() && $form->isValid()){
+			if ($form->get('publier')->isClicked()){
+				$sortie->setEtat(Etat::OUVERTE);
+			}
+			$em->persist($sortie);
+			$em->flush();
 
-    #[Route('/sortie/{id}/desister', name: 'sortie_desister')]
-    public function desister(Sortie $sortie, EntityManagerInterface $em, Security $security): Response
-    {
-        $participant = $security->getUser();
+			$this->addFlash("success", "Sortie modifiée avec succès !");
+			return $this->redirectToRoute('main_home');
+		}
 
-        if (!$participant instanceof Participant) {
-            throw new \LogicException('Utilisateur non connecté ou invalide.');
-        }
+		return $this->render('sortie/modifier.html.twig', [
+			'form' => $form,
+			'sortie' => $sortie,
+		]);
+	}
 
-        if ($sortie->getParticipants()->contains($participant)) {
-            $sortie->removeParticipant($participant);
-            $em->flush();
-            $this->addFlash('success', '⚠️ Vous vous êtes désisté(e) de la sortie.');
-        }
+	#[Route('/sortie/{id}/supprimer/{token}', name: 'sortie_supprimer', requirements: ['id' => '\d+'], methods: ['GET'])]
+	public function supprimerSortie(Sortie $sortie, string $token, EntityManagerInterface $em): Response
+	{
+		if($this->isCsrfTokenValid('supprimer-sortie-'.$sortie->getId(), $token)){
+			$em->remove($sortie);
+			$em->flush();
+			$this->addFlash("success", "La sortie à été supprimée avec succès !");
+			return $this->redirectToRoute('main_home');
+		}
+		$this->addFlash("danger", "Une erreur est survenue lors de la suppression de la sortie !");
+		return $this->redirectToRoute('sortie_modifier', ['id' => $sortie->getId()]);
 
-        return $this->redirectToRoute('main_home');
-    }
-
-    #[Route('/sortie/{id}', name: 'sortie_details')]
-    public function details(Sortie $sortie): Response
+	}
+    #[Route('/sortie/{id}', name: 'sortie_details', requirements: ['id' => '\d+'], methods: ['GET'])]
+    public function detail(Sortie $sortie): Response
     {
         return $this->render('sortie/details.html.twig', [
             'sortie' => $sortie,
@@ -89,4 +96,76 @@ final class SortieController extends AbstractController
 
 
 
+    #[Route('/sortie/{id}/inscription', name: 'sortie_inscrire', methods: ['POST'])]
+    public function inscrire(Sortie $sortie, EntityManagerInterface $em): Response
+    {
+        $user = $this->getUser();
+
+        if (!$user instanceof Participant) {
+            $this->addFlash('danger', 'Vous devez être connecté pour vous inscrire.');
+            return $this->redirectToRoute('app_login');
+        }
+
+        // Déjà inscrit
+        if ($sortie->getParticipants()->contains($user)) {
+            $this->addFlash('info', 'Vous êtes déjà inscrit(e) à cette sortie.');
+            return $this->redirectToRoute('main_home');
+        }
+
+        //  Sortie non ouverte
+        if ($sortie->getEtat() !== Etat::OUVERTE) {
+            $this->addFlash('danger', 'Cette sortie n’est pas ouverte à l’inscription.');
+            return $this->redirectToRoute('main_home');
+        }
+
+        //  Sortie complète
+        if (
+            $sortie->getNbInscriptionMax() !== null &&
+            $sortie->getParticipants()->count() >= $sortie->getNbInscriptionMax()
+        ) {
+            $this->addFlash('danger', 'Cette sortie est déjà complète.');
+            return $this->redirectToRoute('main_home');
+        }
+
+        //  Date limite d’inscription dépassée
+        if ($sortie->getDateLimiteInscription() < new \DateTimeImmutable()) {
+            $this->addFlash('danger', 'La date limite d’inscription est dépassée.');
+            return $this->redirectToRoute('main_home');
+        }
+
+        //  Inscription OK
+        $sortie->addParticipant($user);
+        $em->flush();
+        $this->addFlash('success', 'Inscription réussie à la sortie !');
+
+        return $this->redirectToRoute('main_home');
+    }
+
+    #[Route('/sortie/{id}/desister', name: 'sortie_desister', methods: ['POST'])]
+    public function desister(Sortie $sortie, EntityManagerInterface $em): Response
+    {
+        $user = $this->getUser();
+
+        if (!$user instanceof Participant) {
+            $this->addFlash('danger', 'Vous devez être connecté pour vous désister.');
+            return $this->redirectToRoute('app_login');
+        }
+
+        // Si la sortie a déjà commencé
+        if ($sortie->getDateHeureDebut() < new \DateTimeImmutable()) {
+            $this->addFlash('danger', 'Vous ne pouvez plus vous désister d’une sortie déjà commencée.');
+            return $this->redirectToRoute('main_home');
+        }
+
+        // Désistement
+        if ($sortie->getParticipants()->contains($user)) {
+            $sortie->removeParticipant($user);
+            $em->flush();
+            $this->addFlash('success', 'Vous vous êtes désisté(e) de la sortie.');
+        } else {
+            $this->addFlash('warning', 'Vous n\'êtes pas inscrit(e) à cette sortie.');
+        }
+
+        return $this->redirectToRoute('main_home');
+    }
 }
