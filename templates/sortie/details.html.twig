@@ -1,5 +1,10 @@
-<h1>Détails de la sortie</h1>
+{% extends 'base.html.twig' %}
 
+{% block title %}
+Détails | sortie
+{% endblock %}
+
+{% block body %}
 <p><strong>Nom :</strong> {{ sortie.nom }}</p>
 <p><strong>Date :</strong> {{ sortie.dateHeureDebut|date('d/m/Y H:i') }}</p>
 <p><strong>Organisateur :</strong> {{ sortie.organisateur.pseudo }}</p>
@@ -7,3 +12,5 @@
 <p><strong>Description :</strong> {{ sortie.infosSortie }}</p>
 
 <a href="{{ path('main_home') }}" class="btn btn-secondary mt-3">Retour</a>
+
+{% endblock %}
