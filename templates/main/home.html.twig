@@ -107,7 +107,11 @@
                 </td>
 
                 <td>
-                    <a href="{{ path('sortie_details', {id: sortie.id}) }}" class="btn btn-info btn-sm">Détails</a>
+                    {% if sortie.etat != 'HISTORISEE' %}
+                        <a href="{{ path('sortie_details', {id: sortie.id}) }}" class="btn btn-info btn-sm">Détails</a>
+                    {% else %}
+                        <span class="text-muted">Détails non disponibles</span>
+                    {% endif %}
 
                     {% if sortie.etat == constant('App\\Utils\\Etat::OUVERTE') %}
                         {% set inscriptionPossible = sortie.dateLimiteInscription > "now"|date('Y-m-d H:i') and (sortie.nbInscriptionMax > sortie.participants|length or sortie.nbInscriptionMax is null) %}

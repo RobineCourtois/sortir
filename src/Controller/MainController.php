@@ -33,7 +33,6 @@ final class MainController extends AbstractController
         if (
             empty($filters['organisateur']) &&
             empty($filters['inscrit']) &&
-            empty($filters['non_inscrit']) &&
             empty($filters['terminees'])
         ) {
             $filters['etat'] = Etat::OUVERTE;
