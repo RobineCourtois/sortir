@@ -29,7 +29,7 @@ final class MainController extends AbstractController
 
         $filters = $form->getData();
 
-        // Par défaut, état "OUVERTE" si aucune case n’est cochée
+        // Par défaut, état "OUVERTE" si aucune case n’est cochée.
         if (
             empty($filters['organisateur']) &&
             empty($filters['inscrit']) &&
