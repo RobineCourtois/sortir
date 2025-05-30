@@ -42,12 +42,21 @@ class SortieRepository extends ServiceEntityRepository
 //            ->getOneOrNullResult()
 //        ;
 //    }
-    public function findFiltered(Participant $participant, array $filters): array
+    public function findFiltered(Participant $participant, array $filters, bool $isAdmin = false): array
     {
         $qb = $this->createQueryBuilder('sortie')
             ->leftJoin('sortie.organisateur', 'organisateur')
             ->leftJoin('sortie.participants', 'participants')
             ->addSelect('organisateur', 'participants');
+
+        if ($isAdmin) {
+            // Admin voit tout, sans aucune restriction ni filtre
+            return $qb->orderBy('sortie.dateHeureDebut', 'ASC')
+                ->getQuery()
+                ->getResult();
+        }
+
+        // -- Partie filtres normale pour utilisateur non-admin --
 
         // Campus
         if (!empty($filters['campus'])) {
@@ -68,30 +77,24 @@ class SortieRepository extends ServiceEntityRepository
                 ->setParameter('fin', $filters['dateFin']);
         }
 
-        // Organisateur et/ou inscrit/non inscrit
+        // Organisateur / inscrit / non inscrit
         $orConditions = [];
 
-        // Organisateur
         if (!empty($filters['organisateur'])) {
             $orConditions[] = 'sortie.organisateur = :participant';
         }
-
-        // Inscrit
         if (!empty($filters['inscrit'])) {
             $orConditions[] = ':participant MEMBER OF sortie.participants';
         }
-
-        // Non inscrit
         if (!empty($filters['non_inscrit'])) {
             $orConditions[] = ':participant NOT MEMBER OF sortie.participants';
         }
-
         if (!empty($orConditions)) {
             $qb->andWhere(implode(' OR ', $orConditions))
                 ->setParameter('participant', $participant);
         }
 
-        // État : Terminé OU autres
+        // États (Terminé, etc.)
         $etatConditions = [];
         if (!empty($filters['terminees'])) {
             $etatConditions[] = 'sortie.etat = :etat_terminee';
@@ -110,12 +113,11 @@ class SortieRepository extends ServiceEntityRepository
             $qb->andWhere(implode(' OR ', $etatConditions));
         }
 
-        // En création : visible uniquement à l’organisateur
+        // Restriction sur la création : visible uniquement à l’organisateur
         $qb->andWhere('sortie.etat != :etat_creation OR sortie.organisateur = :participant')
             ->setParameter('etat_creation', Etat::EN_CREATION)
             ->setParameter('participant', $participant);
 
-        // Tri
         return $qb->orderBy('sortie.dateHeureDebut', 'ASC')
             ->getQuery()
             ->getResult();

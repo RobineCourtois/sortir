@@ -38,8 +38,11 @@ final class MainController extends AbstractController
             $filters['etat'] = [Etat::OUVERTE];
         }
 
-        // Méthode personnalisée de filtrage
-        $sorties = $sortieRepository->findFiltered($this->getUser(), $filters);
+        // Détecter si l'utilisateur est admin
+        $isAdmin = $this->isGranted('ROLE_ADMIN');
+
+        // Appeler la méthode avec admin
+        $sorties = $sortieRepository->findFiltered($this->getUser(), $filters, $isAdmin);
 
         return $this->render('main/home.html.twig', [
             'form' => $form->createView(),
@@ -47,4 +50,5 @@ final class MainController extends AbstractController
             'participant' => $this->getUser(),
         ]);
     }
+
 }
