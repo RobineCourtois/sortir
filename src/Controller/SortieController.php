@@ -156,6 +156,9 @@ final class SortieController extends AbstractController
 
         //  Inscription OK
         $sortie->addParticipant($user);
+		if ($sortie->getNbInscriptionMax() == $sortie->getParticipants()->count()){
+			$sortie->setEtat(Etat::CLOTUREE);
+		}
         $em->flush();
         $this->addFlash('success', 'Inscription réussie à la sortie !');
 
@@ -178,8 +181,12 @@ final class SortieController extends AbstractController
             return $this->redirectToRoute('main_home');
         }
 
+
         // Désistement
         if ($sortie->getParticipants()->contains($user)) {
+			if ($sortie->getNbInscriptionMax() == $sortie->getParticipants()->count()){
+				$sortie->setEtat(Etat::OUVERTE);
+			}
             $sortie->removeParticipant($user);
             $em->flush();
             $this->addFlash('success', 'Vous vous êtes désisté(e) de la sortie.');
