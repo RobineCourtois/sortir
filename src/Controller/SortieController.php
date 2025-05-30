@@ -189,4 +189,18 @@ final class SortieController extends AbstractController
 
         return $this->redirectToRoute('main_home');
     }
+
+	#[Route('/sortie/{id}/annuler', name: 'sortie_annuler', methods: ['GET'])]
+	public function annuler(Sortie $sortie, EntityManagerInterface $em):Response
+	{
+		if($this->getUser() !== $sortie->getOrganisateur() and !$this->isGranted('ROLE_ADMIN')){
+			throw $this->createAccessDeniedException("Vous n'avez pas le droit d'annuler cette sortie");
+		}
+
+		$sortie->setEtat(Etat::ANNULEE);
+		$em->persist($sortie);
+		$em->flush();
+
+		return $this->redirectToRoute('main_home');
+	}
 }

@@ -116,7 +116,7 @@
                     {% if sortie.etat == constant('App\\Utils\\Etat::OUVERTE') %}
                         {% set inscriptionPossible = sortie.dateLimiteInscription > "now"|date('Y-m-d H:i') and (sortie.nbInscriptionMax > sortie.participants|length or sortie.nbInscriptionMax is null) %}
 
-                        {% if not sortie.estInscrit(participant) and inscriptionPossible %}
+                        {% if not sortie.estInscrit(participant) and inscriptionPossible and app.user != sortie.organisateur %}
                             <form action="{{ path('sortie_inscrire', {'id': sortie.id}) }}" method="post" style="display:inline;">
                                 <button type="submit" class="btn btn-success btn-sm">S'inscrire</button>
                             </form>
@@ -129,6 +129,9 @@
 
                     {% if (sortie.organisateur == app.user or app.user.administrateur ) and sortie.etat.value == "En création" %}
                         <a href="{{ path('sortie_modifier', {'id': sortie.id}) }}" class="btn btn-primary btn-sm">Modifier</a>
+                    {% endif %}
+                    {% if (sortie.organisateur == app.user or app.user.administrateur) and sortie.etat.value == "Ouverte" %}
+                        <a href="{{ path('sortie_annuler', {'id': sortie.id}) }}" class="btn btn-danger btn-sm">Annuler</a>
                     {% endif %}
                 </td>
 
