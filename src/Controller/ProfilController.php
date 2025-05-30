@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\Entity\Participant;
 use App\Form\ProfilForm;
 use App\Repository\ParticipantRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -13,7 +12,9 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+#[IsGranted("ROLE_PARTICIPANT")]
 final class ProfilController extends AbstractController
 {
     #[Route('/profil/{id}', name: 'profil_consulter', requirements: ['id' => '\d+'], methods: ['GET'])]
@@ -44,6 +45,7 @@ final class ProfilController extends AbstractController
 
 		$form->handleRequest($request);
 
+
 		if ($form->isSubmitted() && $form->isValid()){
 
 //			dd($form->getData());
@@ -56,7 +58,9 @@ final class ProfilController extends AbstractController
 			$em->persist($participant);
 			$em->flush();
 
-			return $security->login($participant, 'form_login', 'main');
+			$this->addFlash("success", "Profil modifié avec succès !");
+//			return $security->login($participant, 'form_login', 'main');
+			return $this->redirectToRoute('main_home');
 		}
 
 

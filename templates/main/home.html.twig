@@ -123,7 +123,7 @@
                         {% endif %}
                     {% endif %}
 
-                    {% if sortie.organisateur == app.user or app.user.administrateur %}
+                    {% if (sortie.organisateur == app.user or app.user.administrateur ) and sortie.etat.value == "En création" %}
                         <a href="{{ path('sortie_modifier', {'id': sortie.id}) }}" class="btn btn-primary btn-sm">Modifier</a>
                     {% endif %}
                 </td>

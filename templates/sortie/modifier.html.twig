@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block body %}
-	<h1>Créer une sortie</h1>
+	<h1>Modifier une sortie</h1>
 	{{ form_start(form) }}
 	<ul class="container">
 		<li class="row">
@@ -20,15 +20,15 @@
 		</li>
 		<li class="row">
 			<div class="col-6">{{ form_row(form.dateLimiteInscription) }} </div>
-			<div class="col-6">Rue {{ sortie.lieu.rue }}</div>
+			<div class="col-6">Rue <div id="lieu_rue"></div></div>
 		</li>
 		<li class="row">
 			<div class="col-6">{{ form_row(form.nbInscriptionMax) }} </div>
-			<div class="col-6">Code postal {{ sortie.lieu.ville.codePostal }}</div>
+			<div class="col-6">Ville <div id="lieu_code_postal"></div></div>
 		</li>
 		<li class="row">
 			<div class="col-6">{{ form_row(form.duree) }} </div>
-			<div class="col-6">Latitude / Longitude {{ sortie.lieu.latitude }} / {{ sortie.lieu.longitude }}</div>
+			<div class="col-6">Latitude / Longitude <div id="lieu_latitude_longitude"></div></div>
 		</li>
 		<li>
 			<div class="col-12">{{ form_row(form.infosSortie) }}</div>
@@ -40,7 +40,32 @@
 		<a href="{{ path('sortie_supprimer', {id:sortie.id, token: csrf_token('supprimer-sortie-'~sortie.id)}) }}" class="btn btn-danger">Supprimer</a>
 		<a href="{{ path('main_home') }}" class="btn btn-primary">Retour à la liste</a>
 	</div>
+	<script>
+		const lieu = document.getElementById('sortie_form_lieu');
+		let lieuxRues = [];
+		let lieuxCodePostal = [];
+		let lieuxLatitudeLongitude = [];
 
+			{% for lieu in lieux %}
+		lieuxRues['{{ lieu.id }}'] = '{{ lieu.rue }}';
+		lieuxCodePostal['{{ lieu.id }}'] = '{{ lieu.ville.codePostal }}, {{ lieu.ville.nom }}';
+		lieuxLatitudeLongitude['{{ lieu.id }}'] = '{{ lieu.latitude }} / {{ lieu.longitude }}';
+			{% endfor %}
+
+		document.getElementById('lieu_rue').innerText = lieuxRues[lieu.value];
+		document.getElementById('lieu_code_postal').innerText = lieuxCodePostal[lieu.value];
+		document.getElementById('lieu_latitude_longitude').innerText = lieuxLatitudeLongitude[lieu.value];
+
+		console.table(lieuxRues)
+
+		lieu.addEventListener('change', function(){
+
+			console.log(lieuxRues[this.value]);
+			document.getElementById('lieu_rue').innerText = lieuxRues[this.value];
+			document.getElementById('lieu_code_postal').innerText = lieuxCodePostal[this.value];
+			document.getElementById('lieu_latitude_longitude').innerText = lieuxLatitudeLongitude[this.value];
+		})
+	</script>
 	{{ form_end(form) }}
 {% endblock %}
 

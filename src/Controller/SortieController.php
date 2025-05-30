@@ -5,22 +5,30 @@ namespace App\Controller;
 use App\Entity\Participant;
 use App\Entity\Sortie;
 use App\Form\SortieForm;
+use App\Repository\LieuRepository;
 use App\Utils\Etat;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
+#[IsGranted("ROLE_PARTICIPANT")]
 final class SortieController extends AbstractController
 {
 	#[Route('/sortie/creer', name: 'sortie_creer')]
-	public function creerSortie(Request $request, EntityManagerInterface $em): Response
+	public function creerSortie(Request $request, EntityManagerInterface $em, LieuRepository $lieuRepository): Response
 	{
 		$sortie = new Sortie();
 		$sortie->setOrganisateur($this->getUser());
 		$sortie->setEtat(Etat::EN_CREATION);
 
+		$lieux  = $lieuRepository->findAll();
+		$tabLieux = [];
+		foreach ($lieux as $lieu){
+			$tabLieux[$lieu->getId()] = $lieu;
+		}
 
 		$form = $this->createForm(SortieForm::class, $sortie);
 		$form->handleRequest($request);
@@ -38,12 +46,18 @@ final class SortieController extends AbstractController
 
 
 		return $this->render('sortie/creer.html.twig', [
+			'lieux' => $tabLieux,
 			'form' => $form,
 		]);
 	}
 
 	#[Route('/sortie/{id}/modifier', name: 'sortie_modifier', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])]
-	public function modifierSortie(Request $request, Sortie $sortie, EntityManagerInterface $em): Response
+	public function modifierSortie(
+		Request $request,
+		Sortie $sortie,
+		EntityManagerInterface $em,
+		LieuRepository $lieuRepository,
+	): Response
 	{
 
 		if ($sortie->getOrganisateur() !== $this->getUser() and !$this->isGranted('ROLE_ADMIN')){
@@ -51,6 +65,12 @@ final class SortieController extends AbstractController
 		}
 		if ($sortie->getEtat() === Etat::OUVERTE){
 			throw $this->createAccessDeniedException("Une sortie ne peux pas être modifiée une fois publiée");
+		}
+
+		$lieux  = $lieuRepository->findAll();
+		$tabLieux = [];
+		foreach ($lieux as $lieu){
+			$tabLieux[$lieu->getId()] = $lieu;
 		}
 
 		$form = $this->createForm(SortieForm::class, $sortie);
@@ -70,6 +90,7 @@ final class SortieController extends AbstractController
 		return $this->render('sortie/modifier.html.twig', [
 			'form' => $form,
 			'sortie' => $sortie,
+			'lieux' => $tabLieux,
 		]);
 	}
 

@@ -46,6 +46,8 @@ class SortieForm extends AbstractType
             ->add('lieu', EntityType::class, [
                 'class' => Lieu::class,
                 'choice_label' => 'nom',
+				'label' => 'Lieu',
+				'choice_value' => 'id'
             ])
             ->add('siteOrganisateur', EntityType::class, [
                 'class' => Campus::class,
