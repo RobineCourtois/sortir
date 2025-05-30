@@ -107,7 +107,7 @@
                 </td>
 
                 <td>
-                    {% if sortie.etat != 'HISTORISEE' %}
+                    {% if sortie.etat.value != 'Historisée' %}
                         <a href="{{ path('sortie_details', {id: sortie.id}) }}" class="btn btn-info btn-sm">Détails</a>
                     {% else %}
                         <span class="text-muted">Détails non disponibles</span>
