@@ -1,71 +1,96 @@
 {% extends 'base.html.twig' %}
 {% form_theme form 'bootstrap_5_layout.html.twig' %}
 
-
 {% block title %}
 	Modifier une sortie | {{ parent() }}
 {% endblock %}
 
 {% block body %}
-	<h1>Modifier une sortie</h1>
-	{{ form_start(form) }}
-	<ul class="container">
-		<li class="row">
-			<div class="col-6">{{ form_row(form.nom) }} </div>
-			<div class="col-6">{{ form_row(form.siteOrganisateur) }}</div>
-		</li>
-		<li class="row">
-			<div class="col-6">{{ form_row(form.dateHeureDebut) }} </div>
-			<div class="col-6">{{ form_row(form.lieu) }}</div>
-		</li>
-		<li class="row">
-			<div class="col-6">{{ form_row(form.dateLimiteInscription) }} </div>
-			<div class="col-6">Rue <div id="lieu_rue"></div></div>
-		</li>
-		<li class="row">
-			<div class="col-6">{{ form_row(form.nbInscriptionMax) }} </div>
-			<div class="col-6">Ville <div id="lieu_code_postal"></div></div>
-		</li>
-		<li class="row">
-			<div class="col-6">{{ form_row(form.duree) }} </div>
-			<div class="col-6">Latitude / Longitude <div id="lieu_latitude_longitude"></div></div>
-		</li>
-		<li>
-			<div class="col-12">{{ form_row(form.infosSortie) }}</div>
-		</li>
-	</ul>
-	<div>
-		{{ form_row(form.enregistrer) }}
-		{{ form_row(form.publier) }}
-		<a href="{{ path('sortie_supprimer', {id:sortie.id, token: csrf_token('supprimer-sortie-'~sortie.id)}) }}" class="btn btn-danger">Supprimer</a>
-		<a href="{{ path('main_home') }}" class="btn btn-primary">Retour à la liste</a>
+	<div class="container mt-5">
+		<div class="row justify-content-center">
+			<div class="col-md-8">
+				<div class="card shadow form-background">
+					<div class="card-header text-center">
+						<h2 class="mb-0">Modifier une sortie</h2>
+					</div>
+					<div class="card-body">
+						{{ form_start(form) }}
+						<div class="row g-3">
+							<div class="col-md-6">
+								{{ form_row(form.nom) }}
+							</div>
+							<div class="col-md-6">
+								{{ form_row(form.siteOrganisateur) }}
+							</div>
+							<div class="col-md-6">
+								{{ form_row(form.dateHeureDebut) }}
+							</div>
+							<div class="col-md-6">
+								{{ form_row(form.lieu) }}
+							</div>
+							<div class="col-md-6">
+								{{ form_row(form.dateLimiteInscription) }}
+							</div>
+							<div class="col-md-6">
+								<label class="form-label">Rue</label>
+								<div id="lieu_rue" class="form-control-plaintext"></div>
+							</div>
+							<div class="col-md-6">
+								{{ form_row(form.nbInscriptionMax) }}
+							</div>
+							<div class="col-md-6">
+								<label class="form-label">Ville</label>
+								<div id="lieu_code_postal" class="form-control-plaintext"></div>
+							</div>
+							<div class="col-md-6">
+								{{ form_row(form.duree) }}
+							</div>
+							<div class="col-md-6">
+								<label class="form-label">Latitude / Longitude</label>
+								<div id="lieu_latitude_longitude" class="form-control-plaintext"></div>
+							</div>
+							<div class="col-12">
+								{{ form_row(form.infosSortie) }}
+							</div>
+						</div>
+						<div class="mt-4 d-flex flex-wrap gap-2 justify-content-center">
+							{{ form_row(form.enregistrer) }}
+							{{ form_row(form.publier) }}
+							<a href="{{ path('sortie_supprimer', {id: sortie.id, token: csrf_token('supprimer-sortie-' ~ sortie.id)}) }}"
+							   class="btn btn-danger w-100">
+								Supprimer
+							</a>
+							<a href="{{ path('main_home') }}" class="btn btn-light w-100">
+								Retour à la liste
+							</a>
+						</div>
+						{{ form_end(form) }}
+					</div>
+				</div>
+			</div>
+		</div>
 	</div>
+
 	<script>
 		const lieu = document.getElementById('sortie_form_lieu');
 		let lieuxRues = [];
 		let lieuxCodePostal = [];
 		let lieuxLatitudeLongitude = [];
 
-			{% for lieu in lieux %}
+		{% for lieu in lieux %}
 		lieuxRues['{{ lieu.id }}'] = '{{ lieu.rue }}';
 		lieuxCodePostal['{{ lieu.id }}'] = '{{ lieu.ville.codePostal }}, {{ lieu.ville.nom }}';
 		lieuxLatitudeLongitude['{{ lieu.id }}'] = '{{ lieu.latitude }} / {{ lieu.longitude }}';
-			{% endfor %}
+		{% endfor %}
 
 		document.getElementById('lieu_rue').innerText = lieuxRues[lieu.value];
 		document.getElementById('lieu_code_postal').innerText = lieuxCodePostal[lieu.value];
 		document.getElementById('lieu_latitude_longitude').innerText = lieuxLatitudeLongitude[lieu.value];
 
-		console.table(lieuxRues)
-
-		lieu.addEventListener('change', function(){
-
-			console.log(lieuxRues[this.value]);
+		lieu.addEventListener('change', function () {
 			document.getElementById('lieu_rue').innerText = lieuxRues[this.value];
 			document.getElementById('lieu_code_postal').innerText = lieuxCodePostal[this.value];
 			document.getElementById('lieu_latitude_longitude').innerText = lieuxLatitudeLongitude[this.value];
-		})
+		});
 	</script>
-	{{ form_end(form) }}
 {% endblock %}
-

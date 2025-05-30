@@ -35,7 +35,7 @@ final class MainController extends AbstractController
             empty($filters['inscrit']) &&
             empty($filters['terminees'])
         ) {
-            $filters['etat'] = Etat::OUVERTE;
+            $filters['etat'] = [Etat::OUVERTE];
         }
 
         // Méthode personnalisée de filtrage

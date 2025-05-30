@@ -42,71 +42,81 @@ class SortieRepository extends ServiceEntityRepository
 //            ->getOneOrNullResult()
 //        ;
 //    }
-    public function findFiltered( Participant $participant, array $filters): array
+    public function findFiltered(Participant $participant, array $filters): array
     {
-        $queryBuilder = $this->createQueryBuilder('sortie')
+        $qb = $this->createQueryBuilder('sortie')
             ->leftJoin('sortie.organisateur', 'organisateur')
             ->leftJoin('sortie.participants', 'participants')
             ->addSelect('organisateur', 'participants');
 
-        // Campus (siteOrganisateur)
+        // Campus
         if (!empty($filters['campus'])) {
-            $queryBuilder->andWhere('sortie.siteOrganisateur = :campus')
+            $qb->andWhere('sortie.siteOrganisateur = :campus')
                 ->setParameter('campus', $filters['campus']);
         }
 
-        // Nom de la sortie (search)
+        // Nom de la sortie
         if (!empty($filters['search'])) {
-            $queryBuilder->andWhere('LOWER(sortie.nom) LIKE :search')
+            $qb->andWhere('LOWER(sortie.nom) LIKE :search')
                 ->setParameter('search', '%' . strtolower($filters['search']) . '%');
         }
 
         // Dates
         if (!empty($filters['dateDebut']) && !empty($filters['dateFin'])) {
-            $queryBuilder->andWhere('sortie.dateHeureDebut BETWEEN :debut AND :fin')
+            $qb->andWhere('sortie.dateHeureDebut BETWEEN :debut AND :fin')
                 ->setParameter('debut', $filters['dateDebut'])
                 ->setParameter('fin', $filters['dateFin']);
         }
 
-        // Je suis l'organisateur
-        if (!empty($filters['organisateur']) && $participant) {
-            $queryBuilder->andWhere('sortie.organisateur = :participant')
+        // Organisateur et/ou inscrit/non inscrit
+        $orConditions = [];
+
+        // Organisateur
+        if (!empty($filters['organisateur'])) {
+            $orConditions[] = 'sortie.organisateur = :participant';
+        }
+
+        // Inscrit
+        if (!empty($filters['inscrit'])) {
+            $orConditions[] = ':participant MEMBER OF sortie.participants';
+        }
+
+        // Non inscrit
+        if (!empty($filters['non_inscrit'])) {
+            $orConditions[] = ':participant NOT MEMBER OF sortie.participants';
+        }
+
+        if (!empty($orConditions)) {
+            $qb->andWhere(implode(' OR ', $orConditions))
                 ->setParameter('participant', $participant);
         }
 
-        // Je suis inscrit
-        if (!empty($filters['inscrit']) && $participant) {
-            $queryBuilder->andWhere(':participant MEMBER OF sortie.participants')
-                ->setParameter('participant', $participant);
-        }
-
-        // Je ne suis PAS inscrit
-        if (!empty($filters['non_inscrit']) && $participant) {
-            $queryBuilder->andWhere(':participant NOT MEMBER OF sortie.participants')
-                ->setParameter('participant', $participant);
-        }
-
-        // État
-        if (!empty($filters['etat'])) {
-            $queryBuilder->andWhere('sortie.etat = :etat')
-                ->setParameter('etat', $filters['etat']);
-        }
-
-        /// Sorties terminées ou à venir
+        // État : Terminé OU autres
+        $etatConditions = [];
         if (!empty($filters['terminees'])) {
-            $queryBuilder->andWhere('sortie.etat = :etat')
-                ->setParameter('etat', Etat::TERMINEE);
-        } elseif (!empty($filters['etat'])) {
-            $queryBuilder->andWhere('sortie.etat = :etat')
-                ->setParameter('etat', $filters['etat']);
-        } else {
-            $queryBuilder->andWhere('sortie.etat != :etat')
-                ->setParameter('etat', Etat::TERMINEE);
+            $etatConditions[] = 'sortie.etat = :etat_terminee';
+            $qb->setParameter('etat_terminee', Etat::TERMINEE);
+        }
+        if (!empty($filters['etat'])) {
+            if (is_array($filters['etat'])) {
+                $etatConditions[] = 'sortie.etat IN (:etats)';
+                $qb->setParameter('etats', $filters['etat']);
+            } else {
+                $etatConditions[] = 'sortie.etat = :etat';
+                $qb->setParameter('etat', $filters['etat']);
+            }
+        }
+        if (!empty($etatConditions)) {
+            $qb->andWhere(implode(' OR ', $etatConditions));
         }
 
+        // En création : visible uniquement à l’organisateur
+        $qb->andWhere('sortie.etat != :etat_creation OR sortie.organisateur = :participant')
+            ->setParameter('etat_creation', Etat::EN_CREATION)
+            ->setParameter('participant', $participant);
 
-        // Tri par date de début
-        return $queryBuilder->orderBy('sortie.dateHeureDebut', 'ASC')
+        // Tri
+        return $qb->orderBy('sortie.dateHeureDebut', 'ASC')
             ->getQuery()
             ->getResult();
     }
