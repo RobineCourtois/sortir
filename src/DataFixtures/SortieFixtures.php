@@ -7,6 +7,7 @@ use App\Entity\Lieu;
 use App\Entity\Participant;
 use App\Entity\Sortie;
 use App\Utils\Etat;
+use DateInterval;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
@@ -24,31 +25,17 @@ class SortieFixtures extends Fixture implements DependentFixtureInterface
         for ($i = 0; $i < 100; $i++) {
             $sortie = new Sortie();
 
-            $dateDebut = \DateTimeImmutable::createFromMutable($faker->dateTimeBetween('+1 day', '+1 month'));
+            $dateDebut = \DateTimeImmutable::createFromMutable($faker->dateTimeBetween('-5 month', '+1 month'));
 
-        // Choix d'un nombre de jours à soustraire pour la limite (max 10)
-        //la date limite doit toujours >= aujourd'hui
-            $maxDaysToSubtract = min(10, $dateDebut->diff(new \DateTimeImmutable('now'))->days);
+			$dateCloture = \DateTimeImmutable::createFromMutable($faker->dateTimeBetween(
+				($dateDebut->sub(new \DateInterval('P' . $faker->numberBetween(1, 3) . 'D')))->format('Y-m-d H:i:s')
+				, $dateDebut->format('Y-m-d H:i:s')));
 
-            if ($maxDaysToSubtract > 0) {
-                $daysToSubtract = $faker->numberBetween(1, $maxDaysToSubtract);
-                $dateLimite = $dateDebut->modify('-' . $daysToSubtract . ' days');
-            } else {
-                // Si dateDebut est dans 1 jour seulement, pas possible de soustraire plus, alors dateLimite = aujourd'hui
-                $dateLimite = new \DateTimeImmutable('now');
-            }
             $sortie->setNom($faker->sentence(3));
             $sortie->setDateHeureDebut($dateDebut);
-            $sortie->setDateLimiteInscription($dateLimite);
-            // Vérifier si date limite est passée par rapport à aujourd'hui
-            if ($dateLimite < new \DateTimeImmutable('now')) {
-                // Sortie clôturée
-                $sortie->setEtat(Etat::CLOTUREE);
-            } else {
-                // Sortie dans un état aléatoire sauf clôturé
-                $etatsPossibles = array_filter(Etat::cases(), fn($e) => $e !== Etat::CLOTUREE);
-                $sortie->setEtat($faker->randomElement($etatsPossibles));
-            }
+            $sortie->setDateLimiteInscription($dateCloture);
+
+
             $sortie->setNbInscriptionMax($faker->numberBetween(5, 30));
             $sortie->setInfosSortie($faker->paragraph(2));
             $sortie->setOrganisateur($this->getReference('participant' . $faker->numberBetween(0, 49),Participant::class));
@@ -60,7 +47,27 @@ class SortieFixtures extends Fixture implements DependentFixtureInterface
                 $sortie->addParticipant($this->getReference('participant' . $faker->numberBetween(0, 49), Participant::class));
             }
 
-            $em->persist($sortie);
+			if ($faker->boolean(10)){
+				$sortie->setEtat(Etat::ANNULEE);
+			} else if ($faker->boolean(10)){
+				$sortie->setEtat(Etat::EN_CREATION);
+			} else {
+				$sortie->setEtat(Etat::OUVERTE);
+			}
+
+			if ($dateCloture < new \DateTimeImmutable('now') || $sortie->getNbInscriptionMax() == $sortie->getParticipants()->count()) {
+				// Sortie clôturée
+				$sortie->setEtat(Etat::CLOTUREE);
+			}
+			$dateFin = $dateDebut->add(new \DateInterval('PT' . $sortie->getDuree() . 'M'));
+			if ($dateFin <= new \DateTimeImmutable('now')){
+				$sortie->setEtat(Etat::TERMINEE);
+			}
+			if ($dateDebut <= (new \DateTimeImmutable('now'))->sub(new DateInterval('P30D'))){
+				$sortie->setEtat(Etat::HISTORISEE);
+			}
+
+			$em->persist($sortie);
         }
 
         $em->flush();
