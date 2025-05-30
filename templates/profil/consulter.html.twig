@@ -3,12 +3,39 @@
 {% block title %}{{ parent() }} | Profil {% endblock %}
 
 {% block body %}
-	<h1>{{ participant.pseudo }}</h1>
-	<ul>
-		<li>Campus : {{ participant.campus.nom }}</li>
-		<li>Prénom : {{ participant.prenom }}</li>
-		<li>Nom : {{ participant.nom }}</li>
-		<li>Telephone  : {{ participant.telephone }}</li>
-		<li>Email : {{ participant.email }}</li>
-	</ul>
+	<div class="container mt-5">
+		<div class="row justify-content-center">
+			<div class="col-md-6">
+				<div class="card shadow-sm form-background">
+					<div class="card-header text-center">
+						<h2 class="mb-0">{{ participant.pseudo }}</h2>
+					</div>
+					<div class="card-body">
+						<ul class="list-group list-group-flush">
+							<li class="list-group-item d-flex justify-content-between">
+								<strong>Campus :</strong> {{ participant.campus.nom }}
+							</li>
+							<li class="list-group-item d-flex justify-content-between">
+								<strong>Prénom :</strong> {{ participant.prenom }}
+							</li>
+							<li class="list-group-item d-flex justify-content-between">
+								<strong>Nom :</strong> {{ participant.nom }}
+							</li>
+							<li class="list-group-item d-flex justify-content-between">
+								<strong>Téléphone :</strong> {{ participant.telephone }}
+							</li>
+							<li class="list-group-item d-flex justify-content-between">
+								<strong>Email :</strong> {{ participant.email }}
+							</li>
+						</ul>
+					</div>
+					<div class="card-footer text-center bg-dark text-light">
+						<a href="{{ path('main_home') }}" class="btn btn-secondary btn-sm me-2">
+							Retour à l'accueil
+						</a>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 {% endblock %}

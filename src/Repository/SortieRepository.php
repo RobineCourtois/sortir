@@ -86,6 +86,12 @@ class SortieRepository extends ServiceEntityRepository
                 ->setParameter('participant', $participant);
         }
 
+        // État
+        if (!empty($filters['etat'])) {
+            $queryBuilder->andWhere('sortie.etat = :etat')
+                ->setParameter('etat', $filters['etat']);
+        }
+
         // Sorties terminées ou à venir
         if (!empty($filters['terminees'])) {
             $queryBuilder->andWhere('sortie.etat IN (:etats)')

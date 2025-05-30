@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Form\FiltreSortieForm;
 use App\Repository\CampusRepository;
 use App\Repository\SortieRepository;
+use App\Utils\Etat;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -26,10 +27,29 @@ final class MainController extends AbstractController
 
         $form->handleRequest($request);
 
-        // On récupère les données (même si le formulaire n’est pas soumis, pour affichage initial)
         $filters = $form->getData();
 
-        // On applique la méthode personnalisée de filtrage
+        //  Si la case organisateur n’est PAS cochée, on applique l’état Ouverte
+        if (empty($filters['organisateur'])) {
+            $filters['etat'] = Etat::OUVERTE;
+        }
+
+        //  Si la case Sorties auxquelles je suis inscrit/e n’est PAS cochée, on applique l’état Ouverte
+        if (empty($filters['inscrit'])) {
+            $filters['etat'] = Etat::OUVERTE;
+        }
+
+        //  Si la case Sorties auxquelles je ne suis pas inscrit/e n’est PAS cochée, on applique l’état Ouverte
+        if (empty($filters['non_inscrit'])) {
+            $filters['etat'] = Etat::OUVERTE;
+        }
+
+        //  Si la case Sorties terminées n’est PAS cochée, on applique l’état Ouverte
+        if (empty($filters['terminees'])) {
+            $filters['etat'] = Etat::OUVERTE;
+        }
+
+        // méthode personnalisée de filtrage
         $sorties = $sortieRepository->findFiltered($this->getUser(), $filters);
 
         return $this->render('main/home.html.twig', [

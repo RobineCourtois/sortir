@@ -21,7 +21,7 @@ class SortieFixtures extends Fixture implements DependentFixtureInterface
 
 
         // Génération aléatoire de sorties
-        for ($i = 0; $i < 20; $i++) {
+        for ($i = 0; $i < 100; $i++) {
             $sortie = new Sortie();
 
             $dateDebut = \DateTimeImmutable::createFromMutable($faker->dateTimeBetween('+1 day', '+1 month'));

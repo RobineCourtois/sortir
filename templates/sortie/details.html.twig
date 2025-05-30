@@ -50,7 +50,11 @@
             <tbody>
             {% for participant in sortie.participants %}
                 <tr>
-                    <td>{{ participant.pseudo }}</td>
+                    <td>
+                        <a href="{{ path('profil_consulter', {'id': participant.id}) }}">
+                            {{ participant.pseudo }}
+                        </a>
+                    </td>
                     <td>{{ participant.prenom }}</td>
                     <td>{{ participant.nom }}</td>
                 </tr>
