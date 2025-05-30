@@ -25,15 +25,33 @@ class SortieFixtures extends Fixture implements DependentFixtureInterface
             $sortie = new Sortie();
 
             $dateDebut = \DateTimeImmutable::createFromMutable($faker->dateTimeBetween('+1 day', '+1 month'));
-            $dateLimite = $dateDebut->modify('-' . $faker->numberBetween(1, 10) . ' days');
 
+        // Choix d'un nombre de jours à soustraire pour la limite (max 10)
+        //la date limite doit toujours >= aujourd'hui
+            $maxDaysToSubtract = min(10, $dateDebut->diff(new \DateTimeImmutable('now'))->days);
+
+            if ($maxDaysToSubtract > 0) {
+                $daysToSubtract = $faker->numberBetween(1, $maxDaysToSubtract);
+                $dateLimite = $dateDebut->modify('-' . $daysToSubtract . ' days');
+            } else {
+                // Si dateDebut est dans 1 jour seulement, pas possible de soustraire plus, alors dateLimite = aujourd'hui
+                $dateLimite = new \DateTimeImmutable('now');
+            }
             $sortie->setNom($faker->sentence(3));
             $sortie->setDateHeureDebut($dateDebut);
             $sortie->setDateLimiteInscription($dateLimite);
+            // Vérifier si date limite est passée par rapport à aujourd'hui
+            if ($dateLimite < new \DateTimeImmutable('now')) {
+                // Sortie clôturée
+                $sortie->setEtat(Etat::CLOTUREE);
+            } else {
+                // Sortie dans un état aléatoire sauf clôturé
+                $etatsPossibles = array_filter(Etat::cases(), fn($e) => $e !== Etat::CLOTUREE);
+                $sortie->setEtat($faker->randomElement($etatsPossibles));
+            }
             $sortie->setNbInscriptionMax($faker->numberBetween(5, 30));
             $sortie->setInfosSortie($faker->paragraph(2));
             $sortie->setOrganisateur($this->getReference('participant' . $faker->numberBetween(0, 49),Participant::class));
-            $sortie->setEtat($faker->randomElement(Etat::cases()));;
             $sortie->setLieu($this->getReference('lieu' . $faker->numberBetween(0, 19), Lieu::class));
             $sortie->setDuree($faker->numberBetween(30, 180));
             $sortie->setSiteOrganisateur($this->getReference('campus' . $faker->numberBetween(0, 3), Campus::class));

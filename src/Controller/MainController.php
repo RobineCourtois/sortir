@@ -29,27 +29,17 @@ final class MainController extends AbstractController
 
         $filters = $form->getData();
 
-        //  Si la case organisateur n’est PAS cochée, on applique l’état Ouverte
-        if (empty($filters['organisateur'])) {
+        // Par défaut, état "OUVERTE" si aucune case n’est cochée
+        if (
+            empty($filters['organisateur']) &&
+            empty($filters['inscrit']) &&
+            empty($filters['non_inscrit']) &&
+            empty($filters['terminees'])
+        ) {
             $filters['etat'] = Etat::OUVERTE;
         }
 
-        //  Si la case Sorties auxquelles je suis inscrit/e n’est PAS cochée, on applique l’état Ouverte
-        if (empty($filters['inscrit'])) {
-            $filters['etat'] = Etat::OUVERTE;
-        }
-
-        //  Si la case Sorties auxquelles je ne suis pas inscrit/e n’est PAS cochée, on applique l’état Ouverte
-        if (empty($filters['non_inscrit'])) {
-            $filters['etat'] = Etat::OUVERTE;
-        }
-
-        //  Si la case Sorties terminées n’est PAS cochée, on applique l’état Ouverte
-        if (empty($filters['terminees'])) {
-            $filters['etat'] = Etat::OUVERTE;
-        }
-
-        // méthode personnalisée de filtrage
+        // Méthode personnalisée de filtrage
         $sorties = $sortieRepository->findFiltered($this->getUser(), $filters);
 
         return $this->render('main/home.html.twig', [

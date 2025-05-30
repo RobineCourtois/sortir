@@ -92,14 +92,18 @@ class SortieRepository extends ServiceEntityRepository
                 ->setParameter('etat', $filters['etat']);
         }
 
-        // Sorties terminées ou à venir
+        /// Sorties terminées ou à venir
         if (!empty($filters['terminees'])) {
-            $queryBuilder->andWhere('sortie.etat IN (:etats)')
-                ->setParameter('etats', [Etat::TERMINEE]);
+            $queryBuilder->andWhere('sortie.etat = :etat')
+                ->setParameter('etat', Etat::TERMINEE);
+        } elseif (!empty($filters['etat'])) {
+            $queryBuilder->andWhere('sortie.etat = :etat')
+                ->setParameter('etat', $filters['etat']);
         } else {
-            $queryBuilder->andWhere('sortie.etat NOT IN (:etats)')
-                ->setParameter('etats', [Etat::TERMINEE]);
+            $queryBuilder->andWhere('sortie.etat != :etat')
+                ->setParameter('etat', Etat::TERMINEE);
         }
+
 
         // Tri par date de début
         return $queryBuilder->orderBy('sortie.dateHeureDebut', 'ASC')
