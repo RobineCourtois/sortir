@@ -59,7 +59,7 @@ class SortieFixtures extends Fixture implements DependentFixtureInterface
 				// Sortie clôturée
 				$sortie->setEtat(Etat::CLOTUREE);
 			}
-			$dateFin = $dateDebut->add(new \DateInterval('PT' . $sortie->getDuree() . 'M'));
+			$dateFin = $dateDebut->add(new DateInterval('PT' . $sortie->getDuree() . 'M'));
 			if ($dateFin <= new \DateTimeImmutable('now')){
 				$sortie->setEtat(Etat::TERMINEE);
 			}

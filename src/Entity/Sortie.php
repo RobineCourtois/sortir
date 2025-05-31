@@ -19,6 +19,7 @@ class Sortie
     private ?int $id = null;
 
 	#[Assert\NotBlank(message: "Merci de renseigner le nom de la sortie")]
+	#[Assert\Length(min:3, minMessage: "Le nom de la sortie doit avoir minimum 3 caractères")]
     #[ORM\Column(length: 255)]
     private ?string $nom = null;
 
@@ -28,7 +29,7 @@ class Sortie
     private ?\DateTimeImmutable $dateHeureDebut = null;
 
 
-	#[Assert\PositiveOrZero]
+	#[Assert\Positive]
     #[ORM\Column(type: Types::INTEGER)]
     private ?int $duree = null;
 
@@ -38,6 +39,7 @@ class Sortie
     #[ORM\Column]
     private ?\DateTimeImmutable $dateLimiteInscription = null;
 
+	#[Assert\Positive]
     #[ORM\Column(nullable: true)]
     private ?int $nbInscriptionMax = null;
 
