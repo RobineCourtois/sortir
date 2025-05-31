@@ -29,7 +29,7 @@ class Sortie
     private ?\DateTimeImmutable $dateHeureDebut = null;
 
 
-	#[Assert\Positive]
+	#[Assert\Positive(message: "Merci d'entrer une valeur positive (petit malin !)")]
     #[ORM\Column(type: Types::INTEGER)]
     private ?int $duree = null;
 
@@ -39,7 +39,7 @@ class Sortie
     #[ORM\Column]
     private ?\DateTimeImmutable $dateLimiteInscription = null;
 
-	#[Assert\Positive]
+	#[Assert\Positive(message: "Il doit y avoir au moins une place disponible pour la sortie")]
     #[ORM\Column(nullable: true)]
     private ?int $nbInscriptionMax = null;
 
