@@ -84,7 +84,8 @@ final class UtilisateurController extends AbstractController
         Request $request,
         EntityManagerInterface $em
     ): Response {
-        // Vérifier le token CSRF
+
+        // Vérifiele token CSRF
         $token = $request->request->get('_token');
         if (!$this->isCsrfTokenValid('toggle-actif-' . $participant->getId(), $token)) {
             $this->addFlash('danger', 'Token CSRF invalide.');

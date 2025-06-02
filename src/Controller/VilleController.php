@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Ville;
+use App\Form\FiltreVilleForm;
 use App\Form\VilleForm;
 use App\Repository\VilleRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -16,19 +17,17 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted("ROLE_ADMIN")]
 final class VilleController extends AbstractController
 {
-	#[Route('/villes', name: 'villes-list', methods: ['GET', 'POST'])]
+	#[Route('/villes/{filtre}', name: 'villes-list', methods: ['GET', 'POST'])]
 	public function villes(
 		VilleRepository $villeRepository,
 		EntityManagerInterface $em,
 		Request $request,
+		?string $filtre = null,
 	): Response
 	{
-		$villes = $villeRepository->findAll();
-
 		$ville = new Ville();
 
 		$villeForm = $this->createForm(VilleForm::class, $ville);
-
 		$villeForm->handleRequest($request);
 
 		if ($villeForm->isSubmitted() && $villeForm->isValid()){
@@ -38,9 +37,29 @@ final class VilleController extends AbstractController
 			return $this->redirectToRoute('villes-list');
 		}
 
-		return $this->render('administration/villes.html.twig', [
+		$filtreForm = $this->createForm(FiltreVilleForm::class);
+		$filtreForm->handleRequest($request);
+
+		if ($filtreForm->isSubmitted()){
+			$filtre = $filtreForm->getData()['nom'];
+			if ($filtre == ''){
+				return $this->redirectToRoute('villes-list');
+			}
+			return $this->redirectToRoute('villes-list', ['filtre' => $filtre]);
+		}
+
+//		dd($filtre);
+
+		if ($filtre !== null) {
+			$villes = $villeRepository->search($filtre);
+		} else {
+			$villes = $villeRepository->findAll();
+		}
+
+		return $this->render('ville/list.html.twig', [
 			'villes' => $villes,
-			'villeForm' => $villeForm->createView(),
+			'villeForm' => $villeForm,
+			'filtreForm' => $filtreForm,
 		]);
 	}
 
