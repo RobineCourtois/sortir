@@ -1,0 +1,41 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}
+Gestion des campus | Sortir.com
+{% endblock %}
+
+
+{% block body %}
+<h1>Gérer les campus</h1>
+    <div>
+        {{ form_start(filtreForm) }}
+        {{ form_row(filtreForm.nom) }}
+        <button type="submit">Rechercher</button>
+        {{ form_end(filtreForm) }}
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>Nom</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for campus in campuss %}
+                <tr>
+                    <td>{{ campus.nom }}</td>
+                    <td>
+                        <a href="{{ path('campus_edit', {'id': campus.id}) }}">Modifier</a>
+                        <a href="{{ path('campus_delete', {'id': campus.id, 'token': csrf_token('supprimer-campus-' ~ campus.id)}) }}">Supprimer</a>
+                    </td>
+                </tr>
+            {% endfor %}
+            <tr>
+                {{ form_start(campusForm) }}
+                <td>{{ form_widget(campusForm.nom) }}</td>
+                <td><button>Ajouter</button></td>
+                {{ form_end(campusForm) }}
+            </tr>
+        </tbody>
+    </table>
+{% endblock %}
