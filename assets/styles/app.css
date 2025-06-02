@@ -11,5 +11,31 @@ body {
 }
 
 
+.checkbox-orange {
+    appearance: none;
+    -webkit-appearance: none;
+    background-color: darkred;
+    border: 2px solid greenyellow;
+    border-radius: 4px;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    position: relative;
+    transition: background-color 0.2s;
+}
+
+.checkbox-orange:checked {
+    background-color: darkseagreen;
+}
+
+.checkbox-orange:checked::after {
+    content: "✔";
+    color: white;
+    font-size: 14px;
+    position: absolute;
+    left: 3px;
+    top: 0;
+}
+
 
 
