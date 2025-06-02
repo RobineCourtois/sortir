@@ -131,7 +131,7 @@
                         <a href="{{ path('sortie_modifier', {'id': sortie.id}) }}" class="btn btn-primary btn-sm">Modifier</a>
                     {% endif %}
                     {% if (sortie.organisateur == app.user or app.user.administrateur) and sortie.etat.value == "Ouverte" %}
-                        <a href="{{ path('sortie_annuler', {'id': sortie.id}) }}" class="btn btn-danger btn-sm"data-bs-toggle="modal" data-bs-target="#modal-annuler-{{ sortie.id }}">Annuler</a>
+                        <a href="{{ path('sortie_annuler', {'id': sortie.id}) }}" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#modal-annuler-{{ sortie.id }}">Annuler</a>
                     {% endif %}
 
                     <!-- Modal pour annuler la sortie -->
