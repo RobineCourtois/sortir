@@ -99,13 +99,14 @@ class SortieRepository extends ServiceEntityRepository
         }
         if (!empty($filters['etat'])) {
             if (is_array($filters['etat'])) {
-                $etatConditions[] = 'sortie.etat IN (:etats)';
-                $qb->setParameter('etats', $filters['etat']);
+                $qb->andWhere('sortie.etat IN (:etat)')
+                    ->setParameter('etat', $filters['etat']);
             } else {
-                $etatConditions[] = 'sortie.etat = :etat';
-                $qb->setParameter('etat', $filters['etat']);
+                $qb->andWhere('sortie.etat = :etat')
+                    ->setParameter('etat', $filters['etat']);
             }
         }
+
         if (!empty($etatConditions)) {
             $qb->andWhere(implode(' OR ', $etatConditions));
         }
