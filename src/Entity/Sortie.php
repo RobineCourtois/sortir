@@ -103,6 +103,11 @@ class Sortie
         return $this;
     }
 
+	public function getDateHeureFin(): ?\DateTimeImmutable
+	{
+		return $this->dateHeureDebut->modify("+{$this->duree} minutes");
+	}
+
     public function getDuree(): ?int
     {
         return $this->duree;
