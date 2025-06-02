@@ -54,6 +54,8 @@ class Sortie
     #[ORM\JoinColumn(nullable: false)]
     private ?Campus $siteOrganisateur = null;
 
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    private ?string $motifAnnulation = null;
     /**
      * @var Collection<int, Participant>
      */
@@ -225,6 +227,17 @@ class Sortie
 
         return $this;
     }
+    public function getMotifAnnulation(): ?string
+    {
+        return $this->motifAnnulation;
+    }
+
+    public function setMotifAnnulation(?string $motifAnnulation): static
+    {
+        $this->motifAnnulation = $motifAnnulation;
+        return $this;
+    }
+
 
 
 }

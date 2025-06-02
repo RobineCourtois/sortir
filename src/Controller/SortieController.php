@@ -197,17 +197,25 @@ final class SortieController extends AbstractController
         return $this->redirectToRoute('main_home');
     }
 
-	#[Route('/sortie/{id}/annuler', name: 'sortie_annuler', methods: ['GET'])]
-	public function annuler(Sortie $sortie, EntityManagerInterface $em):Response
-	{
-		if($this->getUser() !== $sortie->getOrganisateur() and !$this->isGranted('ROLE_ADMIN')){
-			throw $this->createAccessDeniedException("Vous n'avez pas le droit d'annuler cette sortie");
-		}
+    #[Route('/sortie/{id}/annuler', name: 'sortie_annuler', methods: ['POST'])]
+    public function annuler(Sortie $sortie, Request $request, EntityManagerInterface $em): Response
+    {
+        if ($this->getUser() !== $sortie->getOrganisateur() && !$this->isGranted('ROLE_ADMIN')) {
+            throw $this->createAccessDeniedException("Vous n'avez pas le droit d'annuler cette sortie");
+        }
 
-		$sortie->setEtat(Etat::ANNULEE);
-		$em->persist($sortie);
-		$em->flush();
+        $motif = $request->request->get('motifAnnulation');
+        if (!$motif) {
+            $this->addFlash('danger', "Vous devez indiquer un motif d'annulation.");
+            return $this->redirectToRoute('main_home');
+        }
 
-		return $this->redirectToRoute('main_home');
-	}
+        $sortie->setMotifAnnulation($motif);
+        $sortie->setEtat(Etat::ANNULEE);
+        $em->flush();
+
+        $this->addFlash('success', "La sortie a bien été annulée.");
+        return $this->redirectToRoute('main_home');
+    }
+
 }

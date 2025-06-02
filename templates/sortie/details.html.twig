@@ -64,6 +64,11 @@
     {% else %}
         <p class="text-light">Aucun participant inscrit pour le moment.</p>
     {% endif %}
+    {% if sortie.etat == constant('App\\Utils\\Etat::ANNULEE') %}
+        <div class="alert alert-warning mt-3">
+            <strong>Sortie annulée :</strong> {{ sortie.motifAnnulation }}
+        </div>
+    {% endif %}
 
     <a href="{{ path('main_home') }}" class="btn btn-secondary mt-3">Retour</a>
 {% endblock %}

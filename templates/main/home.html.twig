@@ -131,8 +131,34 @@
                         <a href="{{ path('sortie_modifier', {'id': sortie.id}) }}" class="btn btn-primary btn-sm">Modifier</a>
                     {% endif %}
                     {% if (sortie.organisateur == app.user or app.user.administrateur) and sortie.etat.value == "Ouverte" %}
-                        <a href="{{ path('sortie_annuler', {'id': sortie.id}) }}" class="btn btn-danger btn-sm">Annuler</a>
+                        <a href="{{ path('sortie_annuler', {'id': sortie.id}) }}" class="btn btn-danger btn-sm"data-bs-toggle="modal" data-bs-target="#modal-annuler-{{ sortie.id }}">Annuler</a>
                     {% endif %}
+
+                    <!-- Modal pour annuler la sortie -->
+                    <div class="modal fade" id="modal-annuler-{{ sortie.id }}" tabindex="-1" aria-labelledby="modalLabel{{ sortie.id }}" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content bg-dark text-light">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="modalLabel{{ sortie.id }}">Annuler la sortie : {{ sortie.nom }}</h5>
+                                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <form method="post" action="{{ path('sortie_annuler', {'id': sortie.id}) }}">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('annuler_sortie_' ~ sortie.id) }}">
+                                        <div class="mb-3">
+                                            <label for="motif-{{ sortie.id }}" class="form-label">Veuillez renseigner un motif d'annulation :</label>
+                                            <textarea class="form-control" id="motif-{{ sortie.id }}" name="motifAnnulation" rows="4" required></textarea>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                                            <button type="submit" class="btn btn-danger">Annuler la sortie</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 </td>
 
 
