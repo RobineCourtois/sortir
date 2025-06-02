@@ -1,0 +1,15 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+<h1>Page d'administration</h1>
+<div>
+	<a href="{{ path('admin_campus') }}">Gérer les campus</a>
+	<a href="{{ path('admin_villes') }}">Gérer les villes</a>
+	<a href="{{ path('admin_users') }}">Gérer des utilisateurs</a>
+</div>
+
+{% endblock %}
+
+{% block title %}
+Administration | Sortir.com
+{% endblock %}
