@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+	<h1>Modifier une ville</h1>
+	{{ form_start(villeForm) }}
+	{{ form_widget(villeForm) }}
+	<button type="submit">Modifier</button>
+	{{ form_end(villeForm) }}
+{% endblock %}
+
+{% block title %}
+Modifier une ville | Sortir.com
+{% endblock %}
