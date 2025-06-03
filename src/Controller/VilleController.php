@@ -3,7 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Ville;
-use App\Form\FiltreVilleForm;
+use App\Form\FiltreNomForm;
 use App\Form\VilleForm;
 use App\Repository\VilleRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -17,8 +17,8 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted("ROLE_ADMIN")]
 final class VilleController extends AbstractController
 {
-	#[Route('/villes/{filtre}', name: 'villes-list', methods: ['GET', 'POST'])]
-	public function villes(
+	#[Route('/villes/{filtre}', name: 'villes_list', methods: ['GET', 'POST'])]
+	public function list(
 		VilleRepository $villeRepository,
 		EntityManagerInterface $em,
 		Request $request,
@@ -34,21 +34,19 @@ final class VilleController extends AbstractController
 			$em->persist($ville);
 			$em->flush();
 			$this->addFlash("success", "Ville ajoutée avec succes !");
-			return $this->redirectToRoute('villes-list');
+			return $this->redirectToRoute('villes_list');
 		}
 
-		$filtreForm = $this->createForm(FiltreVilleForm::class);
+		$filtreForm = $this->createForm(FiltreNomForm::class);
 		$filtreForm->handleRequest($request);
 
 		if ($filtreForm->isSubmitted()){
 			$filtre = $filtreForm->getData()['nom'];
 			if ($filtre == ''){
-				return $this->redirectToRoute('villes-list');
+				return $this->redirectToRoute('villes_list');
 			}
-			return $this->redirectToRoute('villes-list', ['filtre' => $filtre]);
+			return $this->redirectToRoute('villes_list', ['filtre' => $filtre]);
 		}
-
-//		dd($filtre);
 
 		if ($filtre !== null) {
 			$villes = $villeRepository->search($filtre);
@@ -78,7 +76,7 @@ final class VilleController extends AbstractController
 			$em->persist($ville);
 			$em->flush();
 			$this->addFlash("success", "Ville Modifiée avec succes !");
-			return $this->redirectToRoute('villes-list');
+			return $this->redirectToRoute('villes_list');
 		}
 
         return $this->render('ville/edit.html.twig', [
@@ -97,8 +95,8 @@ final class VilleController extends AbstractController
 		{
 			$em->remove($ville);
 			$em->flush();
-			$this->addFlash("success", "Ville supprimée avec succes");
-			return $this->redirectToRoute('villes-list');
+			$this->addFlash("success", "Ville supprimée avec succes !");
+			return $this->redirectToRoute('villes_list');
 		}
 		$this->addFlash("danger", "Une erreur est survenue lors de la suppression de la ville !");
 		return $this->redirectToRoute('ville_edit', ['id' => $ville->getId()]);

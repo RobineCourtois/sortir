@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+	<h1>Modifier un campus</h1>
+	{{ form_start(campusForm) }}
+	{{ form_widget(campusForm) }}
+	<button type="submit">Modifier</button>
+	{{ form_end(campusForm) }}
+{% endblock %}
+
+{% block title %}
+Modifier un campus | Sortir.com
+{% endblock %}
+

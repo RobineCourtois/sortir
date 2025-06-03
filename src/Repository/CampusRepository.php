@@ -40,4 +40,11 @@ class CampusRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+	public function search(string $filtre)
+	{
+		$qb = $this->createQueryBuilder('c');
+		$qb->where('c.nom LIKE :search')
+			->setParameter('search', '%'.$filtre.'%');
+		return $qb->getQuery()->getResult();
+	}
 }
