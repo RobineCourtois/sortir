@@ -20,7 +20,7 @@ class UtilisateurForm extends AbstractType
             ->add('plainPassword', PasswordType::class, [
                 'mapped' => false,
                 'label' => 'Mot de passe',
-                'required' => $options['is_creation'] ?? false
+                'required' => true,
             ])
             ->add('nom')
             ->add('prenom')

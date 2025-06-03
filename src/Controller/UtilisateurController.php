@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Participant;
 use App\Form\UtilisateurForm;
+use App\Repository\CampusRepository;
 use App\Repository\ParticipantRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -20,16 +21,23 @@ final class UtilisateurController extends AbstractController
     #[Route('/utilisateurs', name: 'gestion-utilisateurs', methods: ['GET', 'POST'])]
     public function utilisateurs(
         ParticipantRepository  $participantRepository,
-        EntityManagerInterface $em,
-        Request                $request,
-    ): Response
-    {
-        $participants = $participantRepository->findAll();
+        CampusRepository       $campusRepository,
+        Request                $request
+    ): Response {
+        $search = $request->query->get('search', '');
+        $campusId = $request->query->get('campus');
+        $campus = $campusId ? $campusRepository->find($campusId) : null;
+
+        $participants = $participantRepository->findBySearch($search, $campus);
 
         return $this->render('administration/utilisateurs.html.twig', [
             'participants' => $participants,
+            'campuses' => $campusRepository->findAll(), // pour le select dans le twig
+            'selectedCampusId' => $campusId, // pour conserver la sélection
+            'search' => $search // pour remplir le champ
         ]);
     }
+
 
     #[Route('/utilisateur/{id}/modifier', name: 'gestion-utilisateur-modifier', methods: ['GET', 'POST'])]
     public function modifier(
@@ -42,11 +50,6 @@ final class UtilisateurController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $plainPassword = $form->get('plainPassword')->getData();
-            if ($plainPassword) {
-                $hashedPassword = $passwordHasher->hashPassword($participant, $plainPassword);
-                $participant->setPassword($hashedPassword);
-            }
 
             $em->flush();
             $this->addFlash('success', 'Utilisateur modifié avec succès.');
@@ -75,12 +78,6 @@ final class UtilisateurController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $plainPassword = $form->get('plainPassword')->getData();
-
-            if ($plainPassword) {
-                $hashedPassword = $passwordHasher->hashPassword($participant, $plainPassword);
-                $participant->setPassword($hashedPassword);
-            }
 
             if ($participant->isAdministrateur()) {
                 $participant->setRoles(['ROLE_USER', 'ROLE_ADMIN']);

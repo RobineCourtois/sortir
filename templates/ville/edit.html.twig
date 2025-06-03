@@ -1,13 +1,28 @@
 {% extends 'base.html.twig' %}
 
-{% block body %}
-	<h1>Modifier une ville</h1>
-	{{ form_start(villeForm) }}
-	{{ form_widget(villeForm) }}
-	<button type="submit">Modifier</button>
-	{{ form_end(villeForm) }}
+{% block title %}
+	Modifier une ville | Sortir.com
 {% endblock %}
 
-{% block title %}
-Modifier une ville | Sortir.com
+{% block body %}
+	<div class="container mt-4">
+		<h2>Modifier une ville</h2>
+
+		{{ form_start(villeForm) }}
+		<div class="mb-3">
+			{{ form_label(villeForm.nom) }}
+			{{ form_widget(villeForm.nom, {'attr': {'class': 'form-control'}}) }}
+			{{ form_errors(villeForm.nom) }}
+		</div>
+
+		<div class="mb-3">
+			{{ form_label(villeForm.codePostal) }}
+			{{ form_widget(villeForm.codePostal, {'attr': {'class': 'form-control'}}) }}
+			{{ form_errors(villeForm.codePostal) }}
+		</div>
+
+		<button type="submit" class="btn btn-primary">Modifier</button>
+		<a href="{{ path('villes_list') }}" class="btn btn-danger ms-2">Annuler</a>
+		{{ form_end(villeForm) }}
+	</div>
 {% endblock %}

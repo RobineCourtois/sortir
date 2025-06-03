@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Campus;
 use App\Entity\Participant;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
@@ -33,28 +34,33 @@ class ParticipantRepository extends ServiceEntityRepository implements PasswordU
         $this->getEntityManager()->flush();
     }
 
-    //    /**
-    //     * @return Participant[] Returns an array of Participant objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('p')
-    //            ->andWhere('p.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('p.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    public function findBySearch(string $search = '', Campus $campus = null): array
+    {
+        $qb = $this->createQueryBuilder('p')
+            ->leftJoin('p.campus', 'c')
+            ->addSelect('c');
 
-    //    public function findOneBySomeField($value): ?Participant
-    //    {
-    //        return $this->createQueryBuilder('p')
-    //            ->andWhere('p.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+        if (!empty($search)) {
+            $qb->andWhere('
+            LOWER(p.nom) LIKE :search 
+            OR LOWER(p.prenom) LIKE :search 
+            OR LOWER(p.pseudo) LIKE :search 
+            OR LOWER(p.email) LIKE :search 
+            OR LOWER(p.telephone) LIKE :search
+            OR LOWER(c.nom) LIKE :search
+        ')
+                ->setParameter('search', '%' . strtolower($search) . '%');
+        }
+
+        if ($campus) {
+            $qb->andWhere('p.campus = :campus')
+                ->setParameter('campus', $campus);
+        }
+
+        return $qb->orderBy('p.nom', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+
 }

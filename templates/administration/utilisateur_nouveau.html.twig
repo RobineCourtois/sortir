@@ -7,6 +7,7 @@
         <h2 class="mb-4">Créer un nouvel utilisateur</h2>
 
         {{ form_start(form) }}
+        {{ form_errors(form) }}
         <div class="card p-4 bg-dark text-white">
             <div class="row mb-3">
                 <div class="col-md-6">
@@ -78,6 +79,7 @@
                 <a href="{{ path('gestion-utilisateurs') }}" class="btn btn-secondary ms-2">Annuler</a>
             </div>
         </div>
+        {{ form_end(form) }}
         {{ form_end(form) }}
     </div>
 {% endblock %}
