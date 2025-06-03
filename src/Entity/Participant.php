@@ -12,8 +12,6 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ParticipantRepository::class)]
-#[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
-#[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_PSEUDO', fields: ['pseudo'])]
 #[UniqueEntity(fields: ['email'], message: "Email déjà utilisé")]
 #[UniqueEntity(fields: ['pseudo'], message: "Pseudo déjà utilisé")]
 class Participant implements UserInterface, PasswordAuthenticatedUserInterface
@@ -25,7 +23,7 @@ class Participant implements UserInterface, PasswordAuthenticatedUserInterface
 
 	#[Assert\NotBlank]
 	#[Assert\Email]
-    #[ORM\Column(length: 180)]
+    #[ORM\Column(length: 180, unique: true)]
     private ?string $email = null;
 
     /**
@@ -77,7 +75,8 @@ class Participant implements UserInterface, PasswordAuthenticatedUserInterface
 
 	#[Assert\NotBlank]
 	#[Assert\Length(min: 3, max: 50)]
-    #[ORM\Column(length: 50)]
+    #[ORM\Column(length: 50,unique: true)]
+
     private ?string $pseudo = null;
 
     #[ORM\ManyToOne(inversedBy: 'participants')]

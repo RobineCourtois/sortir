@@ -18,9 +18,9 @@ class UtilisateurForm extends AbstractType
         $builder
             ->add('email')
             ->add('plainPassword', PasswordType::class, [
-            'mapped' => false,
-            'label' => 'Mot de passe',
-            'required' => true
+                'mapped' => false,
+                'label' => 'Mot de passe',
+                'required' => $options['is_creation'] ?? false
             ])
             ->add('nom')
             ->add('prenom')
@@ -31,14 +31,16 @@ class UtilisateurForm extends AbstractType
             ->add('campus', EntityType::class, [
                 'class' => Campus::class,
                 'choice_label' => 'nom',
-            ])
-        ;
+            ]);
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => Participant::class,
+            'is_creation' => false, // Par défaut : formulaire pour modification
         ]);
     }
 }
+
+

@@ -9,6 +9,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
@@ -32,15 +33,21 @@ final class UtilisateurController extends AbstractController
 
     #[Route('/utilisateur/{id}/modifier', name: 'gestion-utilisateur-modifier', methods: ['GET', 'POST'])]
     public function modifier(
-        Participant            $participant,
-        Request                $request,
-        EntityManagerInterface $em
-    ): Response
-    {
+        Participant $participant,
+        Request $request,
+        EntityManagerInterface $em,
+        UserPasswordHasherInterface $passwordHasher
+    ): Response {
         $form = $this->createForm(UtilisateurForm::class, $participant);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $plainPassword = $form->get('plainPassword')->getData();
+            if ($plainPassword) {
+                $hashedPassword = $passwordHasher->hashPassword($participant, $plainPassword);
+                $participant->setPassword($hashedPassword);
+            }
+
             $em->flush();
             $this->addFlash('success', 'Utilisateur modifié avec succès.');
             return $this->redirectToRoute('gestion-utilisateurs');
@@ -51,20 +58,35 @@ final class UtilisateurController extends AbstractController
             'participant' => $participant,
         ]);
     }
+
     #[Route('/utilisateur/nouveau', name: 'gestion-utilisateur-nouveau', methods: ['GET', 'POST'])]
     public function nouveau(
         Request $request,
-        EntityManagerInterface $em
-    ): Response
-    {
+        EntityManagerInterface $em,
+        UserPasswordHasherInterface $passwordHasher
+    ): Response {
         $participant = new Participant();
-        $form = $this->createForm(UtilisateurForm::class, $participant);
+
+        // ajout de l'option pour la création :
+        $form = $this->createForm(UtilisateurForm::class, $participant, [
+            'is_creation' => true
+        ]);
+
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // Pour la démo, mot de passe par défaut à hasher manuellement
-            $participant->setPassword('password'); // À remplacer par un hash sécurisé
-            $participant->setActif(true);
+            $plainPassword = $form->get('plainPassword')->getData();
+
+            if ($plainPassword) {
+                $hashedPassword = $passwordHasher->hashPassword($participant, $plainPassword);
+                $participant->setPassword($hashedPassword);
+            }
+
+            if ($participant->isAdministrateur()) {
+                $participant->setRoles(['ROLE_USER', 'ROLE_ADMIN']);
+            } else {
+                $participant->setRoles(['ROLE_USER']);
+            }
 
             $em->persist($participant);
             $em->flush();
@@ -78,6 +100,8 @@ final class UtilisateurController extends AbstractController
         ]);
     }
 
+
+
     #[Route('/utilisateur/{id}/toggle-actif', name: 'gestion-utilisateur-toggle-actif', methods: ['POST'])]
     public function toggleActif(
         Participant $participant,
@@ -85,18 +109,18 @@ final class UtilisateurController extends AbstractController
         EntityManagerInterface $em
     ): Response {
 
-        // Vérifiele token CSRF
+        // Vérifie le token CSRF
         $token = $request->request->get('_token');
         if (!$this->isCsrfTokenValid('toggle-actif-' . $participant->getId(), $token)) {
             $this->addFlash('danger', 'Token CSRF invalide.');
             return $this->redirectToRoute('gestion-utilisateurs');
         }
 
-        // Inverser l'état actif
+        // Inverse l'état actif
         $participant->setActif(!$participant->isActif());
         $em->flush();
 
-        // Ajouter un flash en fonction de l'état actif
+        // Ajout d'un flash en fonction de l'état actif
         if ($participant->isActif()) {
             $this->addFlash('success', sprintf("L'utilisateur %s %s a été activé.", $participant->getPrenom(), $participant->getNom()));
         } else {

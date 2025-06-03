@@ -6,60 +6,78 @@
     <div class="container mt-5">
         <h2 class="mb-4">Modifier l’utilisateur : {{ participant.pseudo }}</h2>
 
-        {{ form_start(form) }}
-        <div class="card p-4 bg-dark text-white">
-            <div class="row mb-3">
-                <div class="col-md-6">
-                    {{ form_label(form.nom) }}
-                    {{ form_widget(form.nom, {'attr': {'class': 'form-control'}}) }}
-                    {{ form_errors(form.nom) }}
-                </div>
-                <div class="col-md-6">
-                    {{ form_label(form.prenom) }}
-                    {{ form_widget(form.prenom, {'attr': {'class': 'form-control'}}) }}
-                    {{ form_errors(form.prenom) }}
-                </div>
-            </div>
+                {{ form_start(form) }}
+                <div class="card p-4 bg-dark text-white">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            {{ form_label(form.nom) }}
+                            {{ form_widget(form.nom, {'attr': {'class': 'form-control'}}) }}
+                            {{ form_errors(form.nom) }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form_label(form.prenom) }}
+                            {{ form_widget(form.prenom, {'attr': {'class': 'form-control'}}) }}
+                            {{ form_errors(form.prenom) }}
+                        </div>
+                    </div>
 
-            <div class="row mb-3">
-                <div class="col-md-6">
-                    {{ form_label(form.telephone) }}
-                    {{ form_widget(form.telephone, {'attr': {'class': 'form-control'}}) }}
-                    {{ form_errors(form.telephone) }}
-                </div>
-                <div class="col-md-6">
-                    {{ form_label(form.email) }}
-                    {{ form_widget(form.email, {'attr': {'class': 'form-control'}}) }}
-                    {{ form_errors(form.email) }}
-                </div>
-            </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            {{ form_label(form.telephone) }}
+                            {{ form_widget(form.telephone, {'attr': {'class': 'form-control'}}) }}
+                            {{ form_errors(form.telephone) }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form_label(form.email) }}
+                            {{ form_widget(form.email, {'attr': {'class': 'form-control'}}) }}
+                            {{ form_errors(form.email) }}
+                        </div>
+                    </div>
 
-            <div class="row mb-3">
-                <div class="col-md-6">
-                    {{ form_label(form.pseudo) }}
-                    {{ form_widget(form.pseudo, {'attr': {'class': 'form-control'}}) }}
-                    {{ form_errors(form.pseudo) }}
-                </div>
-                <div class="col-md-6">
-                    {{ form_label(form.plainPassword) }}
-                    {{ form_widget(form.plainPassword, {'attr': {'class': 'form-control'}}) }}
-                    {{ form_errors(form.plainPassword) }}
-                </div>
-            </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            {{ form_label(form.pseudo) }}
+                            {{ form_widget(form.pseudo, {'attr': {'class': 'form-control'}}) }}
+                            {{ form_errors(form.pseudo) }}
+                        </div>
+                        <div class="col-md-6">
+                            {{ form_label(form.plainPassword) }}
+                            {{ form_widget(form.plainPassword, {'attr': {'class': 'form-control'}}) }}
+                            {{ form_errors(form.plainPassword) }}
+                        </div>
+                    </div>
 
-            <div class="row mb-3">
-                <div class="col-md-6">
-                    {{ form_label(form.campus) }}
-                    {{ form_widget(form.campus, {'attr': {'class': 'form-control'}}) }}
-                    {{ form_errors(form.campus) }}
-                </div>
-            </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            {{ form_label(form.campus) }}
+                            {{ form_widget(form.campus, {'attr': {'class': 'form-control'}}) }}
+                            {{ form_errors(form.campus) }}
+                        </div>
+                    </div>
 
-            <div class="text-center">
-                <button type="submit" class="btn btn-primary">Enregistrer les modifications</button>
-                <a href="{{ path('gestion-utilisateurs') }}" class="btn btn-secondary ms-2">Annuler</a>
+                    {# Ajout des cases à cocher #}
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="form-check">
+                                {{ form_widget(form.administrateur, {'attr': {'class': 'form-check-input'}}) }}
+                                {{ form_label(form.administrateur, null, {'label_attr': {'class': 'form-check-label'}}) }}
+                                {{ form_errors(form.administrateur) }}
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check">
+                                {{ form_widget(form.actif, {'attr': {'class': 'form-check-input'}}) }}
+                                {{ form_label(form.actif, null, {'label_attr': {'class': 'form-check-label'}}) }}
+                                {{ form_errors(form.actif) }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-center">
+                        <button type="submit" class="btn btn-success">Enregistrer</button>
+                        <a href="{{ path('gestion-utilisateurs') }}" class="btn btn-secondary ms-2">Annuler</a>
+                    </div>
+                </div>
+                {{ form_end(form) }}
             </div>
-        </div>
-        {{ form_end(form) }}
-    </div>
-{% endblock %}
+        {% endblock %}
