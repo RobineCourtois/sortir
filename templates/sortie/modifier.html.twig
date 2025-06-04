@@ -26,21 +26,26 @@
 								{{ form_row(form.dateHeureDebut) }}
 							</div>
 							<div class="col-md-6">
-								{{ form_row(form.lieu) }}
+								<label for="ville" class="form-label">Ville dans laquelle se déroulera la sortie</label>
+								<select name="ville" id="ville" class="form-select">
+									{% for ville in villes %}
+										<option value="{{ ville.nom }}">{{ ville.nom }}</option>
+									{% endfor %}
+								</select>
 							</div>
 							<div class="col-md-6">
 								{{ form_row(form.dateLimiteInscription) }}
 							</div>
 							<div class="col-md-6">
-								<label class="form-label">Rue</label>
-								<div id="lieu_rue" class="form-control-plaintext"></div>
+								{{ form_row(form.lieu) }}
+
 							</div>
 							<div class="col-md-6">
 								{{ form_row(form.nbInscriptionMax) }}
 							</div>
 							<div class="col-md-6">
-								<label class="form-label">Ville</label>
-								<div id="lieu_code_postal" class="form-control-plaintext"></div>
+								<label class="form-label">Rue</label>
+								<div id="lieu_rue" class="form-control-plaintext"></div>
 							</div>
 							<div class="col-md-6">
 								{{ form_row(form.duree) }}
@@ -74,24 +79,34 @@
 	<script>
 		//TODO: Remplacer par utilisation d'api
 		const lieu = document.getElementById('sortie_form_lieu');
+
 		let lieuxRues = [];
-		let lieuxCodePostal = [];
 		let lieuxLatitudeLongitude = [];
 
 		{% for lieu in lieux %}
 		lieuxRues['{{ lieu.id }}'] = '{{ lieu.rue }}';
-		lieuxCodePostal['{{ lieu.id }}'] = '{{ lieu.ville.codePostal }}, {{ lieu.ville.nom }}';
 		lieuxLatitudeLongitude['{{ lieu.id }}'] = '{{ lieu.latitude }} / {{ lieu.longitude }}';
 		{% endfor %}
 
 		document.getElementById('lieu_rue').innerText = lieuxRues[lieu.value];
-		document.getElementById('lieu_code_postal').innerText = lieuxCodePostal[lieu.value];
 		document.getElementById('lieu_latitude_longitude').innerText = lieuxLatitudeLongitude[lieu.value];
 
 		lieu.addEventListener('change', function () {
 			document.getElementById('lieu_rue').innerText = lieuxRues[this.value];
-			document.getElementById('lieu_code_postal').innerText = lieuxCodePostal[this.value];
 			document.getElementById('lieu_latitude_longitude').innerText = lieuxLatitudeLongitude[this.value];
 		});
+
+		let ville = document.getElementById('ville');
+		let options = lieu.children;
+
+		ville.addEventListener('change', function () {
+			for (let i = 0; i < options.length; i++) {
+				if (options[i].innerText.includes(this.value)) {
+					options[i].style.display = "block"
+				} else {
+					options[i].style.display = "none"
+				}
+			}
+		})
 	</script>
 {% endblock %}

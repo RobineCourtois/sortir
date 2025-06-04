@@ -6,6 +6,7 @@ use App\Entity\Participant;
 use App\Entity\Sortie;
 use App\Form\SortieForm;
 use App\Repository\LieuRepository;
+use App\Repository\VilleRepository;
 use App\Utils\Etat;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -18,7 +19,12 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 final class SortieController extends AbstractController
 {
 	#[Route('/sortie/creer', name: 'sortie_creer')]
-	public function creerSortie(Request $request, EntityManagerInterface $em, LieuRepository $lieuRepository): Response
+	public function creerSortie(
+		Request $request,
+		EntityManagerInterface $em,
+		LieuRepository $lieuRepository,
+		VilleRepository $villeRepository,
+	): Response
 	{
 		$sortie = new Sortie();
 		$sortie->setOrganisateur($this->getUser());
@@ -29,6 +35,8 @@ final class SortieController extends AbstractController
 		foreach ($lieux as $lieu){
 			$tabLieux[$lieu->getId()] = $lieu;
 		}
+
+		$villes = $villeRepository->findAll();
 
 		$form = $this->createForm(SortieForm::class, $sortie);
 		$form->handleRequest($request);
@@ -48,6 +56,7 @@ final class SortieController extends AbstractController
 		return $this->render('sortie/creer.html.twig', [
 			'lieux' => $tabLieux,
 			'form' => $form,
+			'villes' => $villes,
 		]);
 	}
 
@@ -57,6 +66,7 @@ final class SortieController extends AbstractController
 		Sortie $sortie,
 		EntityManagerInterface $em,
 		LieuRepository $lieuRepository,
+		VilleRepository $villeRepository,
 	): Response
 	{
 
@@ -72,6 +82,8 @@ final class SortieController extends AbstractController
 		foreach ($lieux as $lieu){
 			$tabLieux[$lieu->getId()] = $lieu;
 		}
+
+		$villes = $villeRepository->findAll();
 
 		$form = $this->createForm(SortieForm::class, $sortie);
 		$form->handleRequest($request);
@@ -91,6 +103,7 @@ final class SortieController extends AbstractController
 			'form' => $form,
 			'sortie' => $sortie,
 			'lieux' => $tabLieux,
+			'villes' => $villes,
 		]);
 	}
 
