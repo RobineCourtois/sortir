@@ -16,12 +16,19 @@ class UtilisateurForm extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
-            ->add('email')
-            ->add('plainPassword', PasswordType::class, [
-                'mapped' => false,
-                'label' => 'Mot de passe',
-                'required' => true,
-            ])
+            ->add('email');
+
+        // Affiche le champ mot de passe uniquement si on est en création
+        if ($options['is_creation']) {
+            $builder
+                ->add('plainPassword', PasswordType::class, [
+                    'mapped' => false,
+                    'label' => 'Mot de passe',
+                    'required' => true,
+                ]);
+        }
+
+        $builder
             ->add('nom')
             ->add('prenom')
             ->add('telephone')
@@ -33,6 +40,7 @@ class UtilisateurForm extends AbstractType
                 'choice_label' => 'nom',
             ]);
     }
+
 
     public function configureOptions(OptionsResolver $resolver): void
     {

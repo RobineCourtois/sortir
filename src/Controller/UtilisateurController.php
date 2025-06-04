@@ -44,13 +44,16 @@ final class UtilisateurController extends AbstractController
         Participant $participant,
         Request $request,
         EntityManagerInterface $em,
-        UserPasswordHasherInterface $passwordHasher
     ): Response {
-        $form = $this->createForm(UtilisateurForm::class, $participant);
+        // Ajout du paramètre 'is_creation' => false pour ne pas afficher le champ password
+        $form = $this->createForm(UtilisateurForm::class, $participant, [
+            'is_creation' => false
+        ]);
+
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-
+            // Gère le rôle en fonction du booléen administrateur
             if ($participant->isAdministrateur()) {
                 $participant->setRoles(['ROLE_PARTICIPANT', 'ROLE_ADMIN']);
             } else {
@@ -59,6 +62,7 @@ final class UtilisateurController extends AbstractController
 
             $em->flush();
             $this->addFlash('success', 'Utilisateur modifié avec succès.');
+
             return $this->redirectToRoute('gestion-utilisateurs');
         }
 
@@ -76,7 +80,7 @@ final class UtilisateurController extends AbstractController
     ): Response {
         $participant = new Participant();
 
-        // ajout de l'option pour la création :
+        // Précise que c'est pour la création => champ mdp affiché
         $form = $this->createForm(UtilisateurForm::class, $participant, [
             'is_creation' => true
         ]);
@@ -84,7 +88,16 @@ final class UtilisateurController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // Récupération du plainPassword
+            $plainPassword = $form->get('plainPassword')->getData();
 
+            // Hashage du mot de passe
+            if ($plainPassword) {
+                $hashedPassword = $passwordHasher->hashPassword($participant, $plainPassword);
+                $participant->setPassword($hashedPassword);
+            }
+
+            //  Gestion des rôles
             if ($participant->isAdministrateur()) {
                 $participant->setRoles(['ROLE_PARTICIPANT', 'ROLE_ADMIN']);
             } else {
@@ -102,7 +115,6 @@ final class UtilisateurController extends AbstractController
             'form' => $form->createView(),
         ]);
     }
-
 
 
     #[Route('/utilisateur/{id}/toggle-actif', name: 'gestion-utilisateur-toggle-actif', methods: ['POST'])]
