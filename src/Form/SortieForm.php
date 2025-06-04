@@ -7,6 +7,7 @@ use App\Entity\Lieu;
 use App\Entity\Participant;
 use App\Entity\Sortie;
 
+use App\Repository\LieuRepository;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
@@ -45,9 +46,12 @@ class SortieForm extends AbstractType
 			])
             ->add('lieu', EntityType::class, [
                 'class' => Lieu::class,
-                'choice_label' => 'nom',
+                'choice_label' => function (Lieu $lieu) {
+					return $lieu->getNom().' à '.$lieu->getVille()->getNom();
+				},
 				'label' => 'Lieu',
-				'choice_value' => 'id'
+				'choice_value' => 'id',
+
             ])
             ->add('siteOrganisateur', EntityType::class, [
                 'class' => Campus::class,
