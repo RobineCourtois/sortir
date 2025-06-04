@@ -51,6 +51,12 @@ final class UtilisateurController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
 
+            if ($participant->isAdministrateur()) {
+                $participant->setRoles(['ROLE_PARTICIPANT', 'ROLE_ADMIN']);
+            } else {
+                $participant->setRoles(['ROLE_PARTICIPANT']);
+            }
+
             $em->flush();
             $this->addFlash('success', 'Utilisateur modifié avec succès.');
             return $this->redirectToRoute('gestion-utilisateurs');
@@ -80,9 +86,9 @@ final class UtilisateurController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
 
             if ($participant->isAdministrateur()) {
-                $participant->setRoles(['ROLE_USER', 'ROLE_ADMIN']);
+                $participant->setRoles(['ROLE_PARTICIPANT', 'ROLE_ADMIN']);
             } else {
-                $participant->setRoles(['ROLE_USER']);
+                $participant->setRoles(['ROLE_PARTICIPANT']);
             }
 
             $em->persist($participant);
