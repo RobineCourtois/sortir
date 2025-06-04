@@ -76,7 +76,7 @@ final class UtilisateurController extends AbstractController
     public function nouveau(
         Request $request,
         EntityManagerInterface $em,
-        UserPasswordHasherInterface $passwordHasher
+        UserPasswordHasherInterface $hasher
     ): Response {
         $participant = new Participant();
 
@@ -88,14 +88,12 @@ final class UtilisateurController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // Récupération du plainPassword
+
+            /** @var string $plainPassword */
             $plainPassword = $form->get('plainPassword')->getData();
 
-            // Hashage du mot de passe
-            if ($plainPassword) {
-                $hashedPassword = $passwordHasher->hashPassword($participant, $plainPassword);
-                $participant->setPassword($hashedPassword);
-            }
+            // encodage du mot de passe
+            $participant->setPassword($hasher->hashPassword($participant, $plainPassword));
 
             //  Gestion des rôles
             if ($participant->isAdministrateur()) {

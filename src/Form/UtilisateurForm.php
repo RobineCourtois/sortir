@@ -4,12 +4,12 @@ namespace App\Form;
 
 use App\Entity\Campus;
 use App\Entity\Participant;
-use App\Entity\Sortie;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 class UtilisateurForm extends AbstractType
 {
@@ -25,6 +25,11 @@ class UtilisateurForm extends AbstractType
                     'mapped' => false,
                     'label' => 'Mot de passe',
                     'required' => true,
+                    'constraints' => [
+                        new NotBlank([
+                            'message' => 'Le mot de passe ne peut pas être vide',
+                        ]),
+                    ],
                 ]);
         }
 
@@ -41,7 +46,6 @@ class UtilisateurForm extends AbstractType
             ]);
     }
 
-
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
@@ -50,5 +54,3 @@ class UtilisateurForm extends AbstractType
         ]);
     }
 }
-
-

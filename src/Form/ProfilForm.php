@@ -11,6 +11,7 @@ use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 class ProfilForm extends AbstractType
 {
@@ -27,7 +28,12 @@ class ProfilForm extends AbstractType
 				'first_options'  => ['label' => 'Mot de passe', 'hash_property_path' => 'password'],
 				'second_options' => ['label' => 'Confirmer le mot de passe'],
 				'mapped' => false,
-			])
+                'constraints' => [
+                    new NotBlank([
+                        'message' => 'Le mot de passe ne peut pas être vide',
+                    ]),
+                ],
+            ])
             ->add('campus', EntityType::class, [
                 'class' => Campus::class,
                 'choice_label' => 'nom',
