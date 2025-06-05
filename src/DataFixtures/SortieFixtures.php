@@ -47,8 +47,9 @@ class SortieFixtures extends Fixture implements DependentFixtureInterface
                 $sortie->addParticipant($this->getReference('participant' . $faker->numberBetween(0, 49), Participant::class));
             }
 
-			if ($faker->boolean(10)){
+			if ($faker->boolean(30)){
 				$sortie->setEtat(Etat::ANNULEE);
+				$sortie->setMotifAnnulation($faker->paragraph(2));
 			} else if ($faker->boolean(10)){
 				$sortie->setEtat(Etat::EN_CREATION);
 			} else {
@@ -63,7 +64,7 @@ class SortieFixtures extends Fixture implements DependentFixtureInterface
 			if ($dateFin <= new \DateTimeImmutable('now')){
 				$sortie->setEtat(Etat::TERMINEE);
 			}
-			if ($dateDebut <= (new \DateTimeImmutable('now'))->sub(new DateInterval('P30D'))){
+			if ($dateDebut <= (new \DateTimeImmutable('now'))->modify('- 1 month')){
 				$sortie->setEtat(Etat::HISTORISEE);
 			}
 

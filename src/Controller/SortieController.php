@@ -30,6 +30,7 @@ final class SortieController extends AbstractController
 	{
 		$sortie = new Sortie();
 		$sortie->setOrganisateur($this->getUser());
+		$sortie->setSiteOrganisateur($this->getUser()->getCampus());
 		$sortie->setEtat(Etat::EN_CREATION);
 
 		$lieux  = $lieuRepository->findAll();

@@ -10,6 +10,9 @@
 					<div class="card-header text-center">
 						<h2 class="mb-0">{{ participant.pseudo }}</h2>
 					</div>
+					{% if participant.filename %}
+						<img src="{{ asset('uploads/images/'~participant.filename) }}" class="card-img-top img-fluid" alt="photo de profil">
+					{% endif %}
 					<div class="card-body">
 						<ul class="list-group list-group-flush">
 							<li class="list-group-item d-flex justify-content-between">
