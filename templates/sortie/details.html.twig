@@ -9,7 +9,9 @@
 
     <div class="card mb-4 form-background">
         {% if sortie.filename %}
-            <img src="{{ asset('uploads/images/'~sortie.filename) }}" class="card-img-top img-fluid" alt="image de sortie"/>
+            <img src="{{ asset('uploads/images/' ~ sortie.photo) }}" class="card-img-top" alt="Image de la sortie">
+        {% else %}
+            <img src="{{ asset('img/default.jpg') }}" class="card-img-top" alt="Image par défaut">
         {% endif %}
         <div class="card-body">
             <div class="row">

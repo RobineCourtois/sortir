@@ -88,7 +88,7 @@ class SortieRepository extends ServiceEntityRepository
             $qb->andWhere(implode(' OR ', $etatConditions));
         }
 
-        // En création : visible uniquement à l’organisateur
+        // En création : visible uniquement à l’organisateur et l'admin
         $qb->andWhere('sortie.etat != :etat_creation OR sortie.organisateur = :participant')
             ->setParameter('etat_creation', Etat::EN_CREATION)
             ->setParameter('participant', $participant);

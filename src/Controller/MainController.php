@@ -35,20 +35,30 @@ final class MainController extends AbstractController
 
         $filters = $form->getData();
 
-        // Par défaut, état "OUVERTE" si aucune case n’est cochée.
-        if (
-            empty($filters['organisateur']) &&
-            empty($filters['inscrit']) &&
-            empty($filters['terminees'])
-        ) {
-            $filters['etat'] = [Etat::OUVERTE, Etat::ANNULEE];
-        }
-
         // Détecter si l'utilisateur est admin
         $isAdmin = $this->isGranted('ROLE_ADMIN');
 
-        // Appeler la méthode avec admin
-        $sorties = $sortieRepository->findFiltered($this->getUser(), $filters, $isAdmin);
+        if ($isAdmin) {
+            if (empty($filters['etat']) || count($filters['etat']) === 0) {
+                // Remplir le filtre d’état avec tous les états disponibles
+                $filters['etat'] = array_map(
+                    fn($case) => $case->value,
+                    Etat::cases()
+                );
+            }
+        } else {
+            // Pour un participant normal : si aucun filtre organisteur, inscrit ou terminée, par défaut on affiche OUVERTE + ANNULEE
+            if (
+                empty($filters['organisateur']) &&
+                empty($filters['inscrit']) &&
+                empty($filters['terminees'])
+            ) {
+                $filters['etat'] = [Etat::OUVERTE->value, Etat::ANNULEE->value];
+            }
+        }
+
+            // Appel commun à la méthode findFiltered, avec filtre d’états ajusté
+            $sorties = $sortieRepository->findFiltered($participant, $filters, $isAdmin);
 
         // Créer la date du jour
         $dateDuJour = new \DateTimeImmutable();

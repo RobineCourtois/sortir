@@ -37,4 +37,10 @@ body {
     top: 0;
 }
 
+.sortie-image {
+    height: 180px;
+    object-fit: cover;
+    border-bottom: 1px solid #dee2e6;
+}
+
 
