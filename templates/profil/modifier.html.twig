@@ -8,7 +8,11 @@
 			<div class="card-header text-center bg-dark text-light">
 				<h1 class="mb-0">Mon Profil</h1>
 			</div>
+			{% if image %}
+				<img src="{{ asset('uploads/images/'~image) }}" class="card-img-top img-fluid" alt="photo de profil">
+			{% endif %}
 			<div class="card-body">
+
 				{{ form_start(form) }}
 
 				<div class="mb-3 row align-items-center">
@@ -72,6 +76,14 @@
 					<div class="col-sm-7">
 						{{ form_widget(form.plainPassword.second, {'attr': {'class': 'form-control form-control-sm'}}) }}
 						{{ form_errors(form.plainPassword.second) }}
+					</div>
+				</div>
+
+				<div class="mb-4 row align-items-center">
+					<label for="{{ form.image.vars.id }}" class="col-sm-4 col-form-label text-sm-end">Image de profil</label>
+					<div class="col-sm-7">
+						{{ form_widget(form.image, {'attr': {'class': 'form-control form-control-sm'}}) }}
+						{{ form_errors(form.image) }}
 					</div>
 				</div>
 

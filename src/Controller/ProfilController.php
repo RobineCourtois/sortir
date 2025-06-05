@@ -7,6 +7,7 @@ use App\Repository\ParticipantRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -40,6 +41,7 @@ final class ProfilController extends AbstractController
 	): Response
 	{
 		$participant = $this->getUser();
+		$imageFile = $participant->getFilename();
 
 		$form = $this->createForm(ProfilForm::class, $participant);
 
@@ -48,7 +50,19 @@ final class ProfilController extends AbstractController
 
 		if ($form->isSubmitted() && $form->isValid()){
 
-//			dd($form->getData());
+			$imageFile = $form->get('image')->getData();
+			if ($imageFile) {
+				$newFileName = uniqid().'.'.$imageFile->guessExtension();
+				try{
+					$imageFile->move(
+						$this->getParameter('app.project_images_directory'),
+						$newFileName
+					);
+					$participant->setFilename($newFileName);
+				} catch (FileException $e) {
+					$this->addFlash('error', "Le fichier n'a pas pu être enregistré");
+				}
+			}
 
 			/** @var string $plainPassword */
 			$plainPassword = $form->get('plainPassword')->getData();
@@ -65,6 +79,7 @@ final class ProfilController extends AbstractController
 
 
 		return $this->render('profil/modifier.html.twig', [
+			"image" => $imageFile,
 			"form" => $form,
 		]);
 	}

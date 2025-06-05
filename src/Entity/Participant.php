@@ -83,11 +83,15 @@ class Participant implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\JoinColumn(nullable: false)]
     private ?Campus $campus = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $filename = null;
+
     public function __construct()
     {
 		$this->administrateur = false;
         $this->sorties = new ArrayCollection();
         $this->sortiesOrganisees = new ArrayCollection();
+		$this->filename = "default.png";
     }
 
     public function getId(): ?int
@@ -300,6 +304,18 @@ class Participant implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPseudo(string $pseudo): static
     {
         $this->pseudo = $pseudo;
+
+        return $this;
+    }
+
+    public function getFilename(): ?string
+    {
+        return $this->filename;
+    }
+
+    public function setFilename(?string $filename): static
+    {
+        $this->filename = $filename;
 
         return $this;
     }
