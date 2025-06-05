@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\EntityListener\SortieListener;
 use App\Repository\SortieRepository;
 use App\Utils\Etat;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -11,6 +12,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: SortieRepository::class)]
+#[ORM\EntityListeners([SortieListener::class])]
 class Sortie
 {
     #[ORM\Id]
