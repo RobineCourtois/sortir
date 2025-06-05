@@ -1,6 +1,8 @@
 import './bootstrap.js';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/bootstrap.min.js';
+import 'bootstrap-icons/font/bootstrap-icons.css';
+
 /*
  * Welcome to your app's main JavaScript file!
  *

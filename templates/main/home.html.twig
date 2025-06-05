@@ -3,6 +3,14 @@
 {% block title %}Accueil | Sortir.com{% endblock %}
 
 {% block body %}
+    <div class="d-flex justify-content-end mb-3">
+        <div class="text-end">
+            <div>Participant : <strong>{{ participant.pseudo }}</strong></div>
+            <div>Date du jour : <strong>{{ dateDuJour|date('d/m/Y') }}</strong></div>
+        </div>
+    </div>
+
+
 
     {% for label, messages in app.flashes %}
         {% for message in messages %}
@@ -16,6 +24,7 @@
         <h2 class="mb-4">Filtrer les sorties</h2>
 
     <div class="card shadow-sm mb-5 form-background">
+
         <div class="card-body">
             {{ form_start(form) }}
 
@@ -42,8 +51,7 @@
                 </div>
                 <div class="col-md-2 d-flex gap-2">
                     <button type="submit" class="btn btn-success ">Rechercher</button>
-                    <a href="{{ path('main_home') }}" class="btn btn-outline-secondary btn-sm w-auto d-flex align-items-center">
-                        <i class="bi bi-arrow-repeat me-1"></i>
+                    <a href="{{ path('main_home') }}" class="btn btn-secondary btn-sm w-auto d-flex align-items-center">Réinitialiser
                     </a>
                 </div>
 

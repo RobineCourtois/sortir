@@ -16,8 +16,11 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 final class MainController extends AbstractController
 {
     #[Route('/', name: 'main_home', methods: ['GET', 'POST'])]
-    public function home(Request $request, SortieRepository $sortieRepository, CampusRepository $campusRepository): Response
-    {
+    public function home(
+        Request $request,
+        SortieRepository $sortieRepository,
+        CampusRepository $campusRepository
+    ): Response {
         // Création du formulaire avec campus par défaut
         $form = $this->createForm(FiltreSortieForm::class, [
             'campus' => $this->getUser()->getCampus(),
@@ -44,11 +47,16 @@ final class MainController extends AbstractController
         // Appeler la méthode avec admin
         $sorties = $sortieRepository->findFiltered($this->getUser(), $filters, $isAdmin);
 
+        // Créer la date du jour
+        $dateDuJour = new \DateTimeImmutable();
+
         return $this->render('main/home.html.twig', [
             'form' => $form->createView(),
             'sorties' => $sorties,
             'participant' => $this->getUser(),
+            'dateDuJour' => $dateDuJour
         ]);
     }
+
 
 }
