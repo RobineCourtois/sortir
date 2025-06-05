@@ -8,6 +8,9 @@
     <h1>Détails de la sortie</h1>
 
     <div class="card mb-4 form-background">
+        {% if sortie.filename %}
+            <img src="{{ asset('uploads/images/'~sortie.filename) }}" class="card-img-top img-fluid" alt="image de sortie"/>
+        {% endif %}
         <div class="card-body">
             <div class="row">
                 <div class="col-md-6">

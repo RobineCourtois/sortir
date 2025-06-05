@@ -10,6 +10,8 @@ use App\Repository\VilleRepository;
 use App\Utils\Etat;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -42,6 +44,22 @@ final class SortieController extends AbstractController
 		$form->handleRequest($request);
 
 		if ($form->isSubmitted() && $form->isValid()){
+
+			/** @var UploadedFile $image */
+			$imageFile = $form->get('image')->getData();
+			if ($imageFile) {
+				$newFileName = uniqid().'.'.$imageFile->guessExtension();
+				try {
+					$imageFile->move(
+						$this->getParameter('app.project_images_directory'),
+						$newFileName
+					);
+					$sortie->setFilename($newFileName);
+				} catch (FileException $e) {
+					$this->addFlash('error', "Le fichier n'a pas pu être enregistré");
+				}
+			}
+
 			if ($form->get('publier')->isClicked()){
 				$sortie->setEtat(Etat::OUVERTE);
 			}
@@ -89,6 +107,22 @@ final class SortieController extends AbstractController
 		$form->handleRequest($request);
 
 		if ($form->isSubmitted() && $form->isValid()){
+
+			/** @var UploadedFile $image */
+			$imageFile = $form->get('image')->getData();
+			if ($imageFile) {
+				$newFileName = uniqid().'.'.$imageFile->guessExtension();
+				try {
+					$imageFile->move(
+						$this->getParameter('app.project_images_directory'),
+						$newFileName
+					);
+					$sortie->setFilename($newFileName);
+				} catch (FileException $e) {
+					$this->addFlash('error', "Le fichier n'a pas pu être enregistré");
+				}
+			}
+
 			if ($form->get('publier')->isClicked()){
 				$sortie->setEtat(Etat::OUVERTE);
 			}

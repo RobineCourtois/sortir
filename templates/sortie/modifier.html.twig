@@ -13,6 +13,9 @@
 					<div class="card-header text-center">
 						<h2 class="mb-0">Modifier une sortie</h2>
 					</div>
+					{% if sortie.filename %}
+						<img src="{{ asset('uploads/images/'~sortie.filename) }}" class="card-img-top img-fluid" alt="image de sortie"/>
+					{% endif %}
 					<div class="card-body">
 						{{ form_start(form) }}
 						<div class="row g-3">
@@ -56,6 +59,9 @@
 							</div>
 							<div class="col-12">
 								{{ form_row(form.infosSortie) }}
+							</div>
+							<div class="col-12">
+								{{ form_row(form.image) }}
 							</div>
 						</div>
 						<div class="mt-4 d-flex flex-wrap gap-2 justify-content-center">

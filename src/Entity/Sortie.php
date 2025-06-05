@@ -69,6 +69,9 @@ class Sortie
     #[ORM\Column(enumType: Etat::class)]
     private ?Etat $etat = null;
 
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $filename = null;
+
     public function __construct()
     {
         $this->participants = new ArrayCollection();
@@ -240,6 +243,18 @@ class Sortie
     public function setMotifAnnulation(?string $motifAnnulation): static
     {
         $this->motifAnnulation = $motifAnnulation;
+        return $this;
+    }
+
+    public function getFilename(): ?string
+    {
+        return $this->filename;
+    }
+
+    public function setFilename(?string $filename): static
+    {
+        $this->filename = $filename;
+
         return $this;
     }
 
