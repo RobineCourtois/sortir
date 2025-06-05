@@ -21,6 +21,9 @@ final class MainController extends AbstractController
         SortieRepository $sortieRepository,
         CampusRepository $campusRepository
     ): Response {
+        $participant = $this->getUser();
+
+
         // Création du formulaire avec campus par défaut
         $form = $this->createForm(FiltreSortieForm::class, [
             'campus' => $this->getUser()->getCampus(),

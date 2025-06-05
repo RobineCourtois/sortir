@@ -19,7 +19,7 @@ class UtilisateurForm extends AbstractType
         $builder
             ->add('email');
 
-        // Affiche le champ mot de passe uniquement si on est en création
+         // Affiche le champ mot de passe uniquement si on est en création
         if ($options['is_creation']) {
             $builder
                 ->add('plainPassword', PasswordType::class, [

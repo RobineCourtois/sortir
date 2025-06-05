@@ -40,7 +40,10 @@ class Participant implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?string $password = null;
 
-	#[Assert\NotBlank]
+    #[ORM\Column(type: 'boolean')]
+    private bool $mustChangePassword = true;
+
+    #[Assert\NotBlank]
 	#[Assert\Length(min: 2, max: 50)]
     #[ORM\Column(length: 50)]
     private ?string $nom = null;
@@ -318,5 +321,15 @@ class Participant implements UserInterface, PasswordAuthenticatedUserInterface
         $this->filename = $filename;
 
         return $this;
+    }
+
+    public function isMustChangePassword(): bool
+    {
+        return $this->mustChangePassword;
+    }
+
+    public function setMustChangePassword(bool $mustChangePassword): void
+    {
+        $this->mustChangePassword = $mustChangePassword;
     }
 }

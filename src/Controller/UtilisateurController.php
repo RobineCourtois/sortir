@@ -7,12 +7,16 @@ use App\Form\UtilisateurForm;
 use App\Repository\CampusRepository;
 use App\Repository\ParticipantRepository;
 use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
+use SymfonyCasts\Bundle\ResetPassword\ResetPasswordHelperInterface;
 
 #[Route('/administration')]
 #[IsGranted("ROLE_ADMIN")]
@@ -76,26 +80,23 @@ final class UtilisateurController extends AbstractController
     public function nouveau(
         Request $request,
         EntityManagerInterface $em,
-        UserPasswordHasherInterface $hasher
+        UserPasswordHasherInterface $hasher,
+        ResetPasswordHelperInterface $resetPasswordHelper,
+        UrlGeneratorInterface $urlGenerator,
+        MailerInterface $mailer
     ): Response {
         $participant = new Participant();
+        $participant->setMustChangePassword(true);
 
-        // Précise que c'est pour la création => champ mdp affiché
         $form = $this->createForm(UtilisateurForm::class, $participant, [
             'is_creation' => true
         ]);
-
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-
-            /** @var string $plainPassword */
             $plainPassword = $form->get('plainPassword')->getData();
-
-            // encodage du mot de passe
             $participant->setPassword($hasher->hashPassword($participant, $plainPassword));
 
-            //  Gestion des rôles
             if ($participant->isAdministrateur()) {
                 $participant->setRoles(['ROLE_PARTICIPANT', 'ROLE_ADMIN']);
             } else {
@@ -105,7 +106,30 @@ final class UtilisateurController extends AbstractController
             $em->persist($participant);
             $em->flush();
 
-            $this->addFlash('success', 'Nouvel utilisateur créé avec succès.');
+            // Générer le token de réinitialisation
+            $resetToken = $resetPasswordHelper->generateResetToken($participant);
+
+            // Générer l'URL complète de reset
+            $resetUrl = $urlGenerator->generate(
+                'app_reset_password',
+                ['token' => $resetToken->getToken()],
+                UrlGeneratorInterface::ABSOLUTE_URL
+            );
+
+            // Création et envoi de l'email
+            $email = (new TemplatedEmail())
+                ->from('no-reply@sortir.com')
+                ->to($participant->getEmail())
+                ->subject('Réinitialisez votre mot de passe')
+                ->htmlTemplate('reset_password/email.html.twig')
+                ->context([
+                    'resetUrl' => $resetUrl,
+                    'user' => $participant
+                ]);
+
+            $mailer->send($email);
+
+            $this->addFlash('success', 'Nouvel utilisateur créé avec succès. Un e-mail de réinitialisation a été envoyé.');
             return $this->redirectToRoute('gestion-utilisateurs');
         }
 
@@ -113,6 +137,7 @@ final class UtilisateurController extends AbstractController
             'form' => $form->createView(),
         ]);
     }
+
 
 
     #[Route('/utilisateur/{id}/toggle-actif', name: 'gestion-utilisateur-toggle-actif', methods: ['POST'])]
