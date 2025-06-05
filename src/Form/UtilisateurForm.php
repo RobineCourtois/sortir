@@ -19,24 +19,7 @@ class UtilisateurForm extends AbstractType
         $builder
             ->add('email');
 
-         // Affiche le champ mot de passe uniquement si on est en création
-        if ($options['is_creation']) {
-            $builder
-                ->add('plainPassword', PasswordType::class, [
-                    'mapped' => false,
-                    'label' => 'Mot de passe',
-                    'required' => true,
-                    'constraints' => [
-                        new NotBlank([
-                            'message' => 'Le mot de passe ne peut pas être vide',
-                        ]),
-						new Regex(
-							'/^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=.\-_*])([a-zA-Z0-9@#$%^&+=*.\-_]){3,}$/',
-							"Le mot de passe doit contenir au moins: une majuscule, une minuscule, un nombre et un caractère spécial (@#$%^&+=.)"
-						)
-                    ],
-                ]);
-        }
+
 
         $builder
             ->add('nom')
