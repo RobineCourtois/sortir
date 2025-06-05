@@ -25,7 +25,7 @@ class ParticipantsFixtures extends Fixture implements DependentFixtureInterface
 	   $admin->setPrenom("admin");
 	   $admin->setEmail("admin@eni.fr");
 	   $admin->setTelephone("0612345678");
-	   $password = $this->passwordHasher->hashPassword($admin, '123456');
+	   $password = $this->passwordHasher->hashPassword($admin, 'Pa$$w0rd');
 	   $admin->setPassword($password);
 	   $admin->setRoles(['ROLE_ADMIN']);
 	   $admin->setCampus($this->getReference('campus0', Campus::class));
@@ -42,7 +42,7 @@ class ParticipantsFixtures extends Fixture implements DependentFixtureInterface
 		   $praticipant->setPseudo("paricipant$i");
 		   $praticipant->setEmail("participant$i@eni.fr");
 		   $praticipant->setTelephone($faker->phoneNumber);
-		   $password = $this->passwordHasher->hashPassword($praticipant, '123456');
+		   $password = $this->passwordHasher->hashPassword($praticipant, 'Pa$$w0rd');
 		   $praticipant->setPassword($password);
 		   $praticipant->setRoles(['ROLE_PARTICIPANT']);
 		   $praticipant->setCampus($this->getReference('campus'.$faker->numberBetween(0,3), Campus::class));;

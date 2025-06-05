@@ -5,6 +5,7 @@ namespace App\Form;
 use App\Entity\Campus;
 use App\Entity\Participant;
 use App\Entity\Sortie;
+
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
@@ -14,6 +15,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints\Image;
 use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\Regex;
 
 class ProfilForm extends AbstractType
 {
@@ -34,6 +36,10 @@ class ProfilForm extends AbstractType
                     new NotBlank([
                         'message' => 'Le mot de passe ne peut pas être vide',
                     ]),
+					new Regex(
+						'/^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=.\-_*])([a-zA-Z0-9@#$%^&+=*.\-_]){3,}$/',
+						"Le mot de passe doit contenir au moins: une majuscule, une minuscule, un nombre et un caractère spécial (@#$%^&+=.)"
+					)
                 ],
             ])
             ->add('campus', EntityType::class, [

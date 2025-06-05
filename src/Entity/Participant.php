@@ -37,6 +37,9 @@ class Participant implements UserInterface, PasswordAuthenticatedUserInterface
      */
 	//#[Assert\NotBlank]
 	#[Assert\Length(min: 6, max: 4096)]
+	#[Assert\Regex(
+		pattern: "/^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=.\-_*])([a-zA-Z0-9@#$%^&+=*.\-_]){3,}$/"
+	)]
     #[ORM\Column]
     private ?string $password = null;
 
