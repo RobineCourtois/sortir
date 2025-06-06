@@ -62,6 +62,15 @@
 		</thead>
 		<tbody>
 		{% for sortie in sorties %}
+			{% set etatClasse = {
+				'Annulée': 'bg-danger',
+				'En création': 'bg-warning text-dark',
+				'Historisé': 'bg-warning text-dark',
+				'En cours': 'bg-success',
+				'Terminée': 'bg-primary',
+				'Clôturée': 'bg-secondary text-white'
+			}[sortie.etat.value]|default('') %}
+
 			<tr>
 				<td>{{ sortie.nom }}</td>
 				<td>{{ sortie.dateHeureDebut ? sortie.dateHeureDebut|date('d/m/Y') : '' }}</td>
