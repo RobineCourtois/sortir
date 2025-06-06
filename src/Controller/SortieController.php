@@ -9,6 +9,7 @@ use App\Form\SortieForm;
 use App\Repository\LieuRepository;
 use App\Repository\VilleRepository;
 use App\Utils\Etat;
+use App\Utils\ImageSaver;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
@@ -47,20 +48,11 @@ final class SortieController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
 
-            /** @var UploadedFile $image */
-            $imageFile = $form->get('image')->getData();
-            if ($imageFile) {
-                $newFileName = uniqid() . '.' . $imageFile->guessExtension();
-                try {
-                    $imageFile->move(
-                        $this->getParameter('app.project_images_directory'),
-                        $newFileName
-                    );
-                    $sortie->setFilename($newFileName);
-                } catch (FileException $e) {
-                    $this->addFlash('error', "Le fichier n'a pas pu être enregistré");
-                }
-            }
+			try {
+				ImageSaver::save($form->get('image')->getData(), $this->getParameter('app.project_images_directory'), $sortie);
+			} catch (FileException $e) {
+				$this->addFlash('error', "Le fichier n'a pas pu être enregistré");
+			}
 
             if ($form->get('publier')->isClicked()) {
                 $sortie->setEtat(Etat::OUVERTE);
@@ -111,20 +103,11 @@ final class SortieController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
 
-            /** @var UploadedFile $image */
-            $imageFile = $form->get('image')->getData();
-            if ($imageFile) {
-                $newFileName = uniqid() . '.' . $imageFile->guessExtension();
-                try {
-                    $imageFile->move(
-                        $this->getParameter('app.project_images_directory'),
-                        $newFileName
-                    );
-                    $sortie->setFilename($newFileName);
-                } catch (FileException $e) {
-                    $this->addFlash('error', "Le fichier n'a pas pu être enregistré");
-                }
-            }
+			try {
+				ImageSaver::save($form->get('image')->getData(), $this->getParameter('app.project_images_directory'), $sortie);
+			} catch (FileException $e) {
+				$this->addFlash('error', "Le fichier n'a pas pu être enregistré");
+			}
 
             if ($form->get('publier')->isClicked()) {
                 $sortie->setEtat(Etat::OUVERTE);
