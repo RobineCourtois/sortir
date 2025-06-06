@@ -3,8 +3,12 @@
 namespace App\Controller;
 
 use App\Entity\Ville;
+use App\Form\FiltreSortieForm;
 use App\Form\VilleForm;
+use App\Repository\CampusRepository;
+use App\Repository\SortieRepository;
 use App\Repository\VilleRepository;
+use App\Utils\Etat;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,6 +29,35 @@ final class AdministrationController extends AbstractController
         ]);
     }
 
+	#[Route('/sorties', name: 'admin_sorties', methods: 'GET')]
+	public function listSorties(
+		Request $request,
+		SortieRepository $sortieRepository,
+		CampusRepository $campusRepository,
+	): Response
+	{
+		$form = $this->createForm(FiltreSortieForm::class, [], [
+			'campus_choices' => $campusRepository->findAll(),
+		]);
+
+		$form->handleRequest($request);
+		$filters = $form->getData();
+
+		if (empty($filters['état']) || count($filters['état']) === 0) {
+			$filters['état'] = array_map(
+				fn($case) => $case->value,
+				Etat::cases()
+			);
+		}
+
+		$sorties = $sortieRepository->findFiltered($this->getUser(), $filters, true);
+
+		return $this->render('administration/sorties.html.twig', [
+			'form' => $form,
+			'sorties' => $sorties,
+			'dateDuJour' => new \DateTimeImmutable()
+		]);
+	}
 
 
 }

@@ -9,7 +9,7 @@
 				<h1 class="mb-0">Mon Profil</h1>
 			</div>
 			{% if image %}
-				<img src="{{ asset('uploads/images/'~image) }}" class="card-img-top img-fluid" alt="photo de profil">
+				<img src="{{ asset('uploads/images/'~image) }}" class="card-img-top img-fluid" alt="photo de {{ app.user.pseudo }}">
 			{% endif %}
 			<div class="card-body">
 

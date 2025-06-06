@@ -1,0 +1,140 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+	<h2 class="mb-4">Filtrer les sorties</h2>
+	<div class="card shadow-sm mb-5 form-background">
+		<div class="card-body">
+			{{ form_start(form) }}
+			<div class="row g-3">
+				<div class="col-md-3 mb-3">
+					{{ form_label(form.campus) }}
+					{{ form_widget(form.campus, {'attr': {'class': 'form-control'}}) }}
+					{{ form_errors(form.campus) }}
+				</div>
+				<div class="col-md-3 mb-3">
+					{{ form_label(form.search) }}
+					{{ form_widget(form.search, {'attr': {'class': 'form-control'}}) }}
+					{{ form_errors(form.search) }}
+				</div>
+				<div class="col-md-2 mb-3">
+					{{ form_label(form.dateDebut) }}
+					{{ form_widget(form.dateDebut, {'attr': {'class': 'form-control'}}) }}
+					{{ form_errors(form.dateDebut) }}
+				</div>
+				<div class="col-md-2 mb-3">
+					{{ form_label(form.dateFin) }}
+					{{ form_widget(form.dateFin, {'attr': {'class': 'form-control'}}) }}
+					{{ form_errors(form.dateFin) }}
+				</div>
+				<div class="col-md-2 d-flex gap-2">
+					<button type="submit" class="btn btn-success">Rechercher</button>
+					<a href="{{ path('main_home') }}" class="btn btn-secondary btn-sm d-flex align-items-center">Réinitialiser</a>
+				</div>
+			</div>
+			<div class="row g-3 mt-3">
+				<div class="col d-flex flex-wrap gap-4">
+					{% for field in ['organisateur', 'inscrit', 'non_inscrit', 'terminees'] %}
+						<div class="form-check">
+							{{ form_widget(attribute(form, field), {'attr': {'class': 'form-check-input'}}) }}
+							{{ form_label(attribute(form, field), null, {'label_attr': {'class': 'form-check-label ms-1'}}) }}
+						</div>
+					{% endfor %}
+				</div>
+			</div>
+			{{ form_end(form) }}
+		</div>
+	</div>
+
+	{# ======================== ADMIN TABLEAU ========================= #}
+	<h2 class="mb-4">Liste des sorties (Vue admin)</h2>
+	<table class="table table-striped table-bordered">
+		<thead class="table-success">
+		<tr>
+			<th>Nom de la sortie</th>
+			<th>Date de la sortie</th>
+			<th>Clôture</th>
+			<th>Inscrit / Places</th>
+			<th>État</th>
+			<th>Inscrit</th>
+			<th>Organisateur</th>
+			<th>Actions</th>
+		</tr>
+		</thead>
+		<tbody>
+		{% for sortie in sorties %}
+			<tr>
+				<td>{{ sortie.nom }}</td>
+				<td>{{ sortie.dateHeureDebut ? sortie.dateHeureDebut|date('d/m/Y') : '' }}</td>
+				<td>{{ sortie.dateLimiteInscription ? sortie.dateLimiteInscription|date('d/m/Y') : '' }}</td>
+				<td>{{ sortie.participants|length }} / {{ sortie.nbInscriptionMax ?: '∞' }}</td>
+				<td>{{ sortie.etat.value ?? sortie.etat }}</td>
+				<td>{{ sortie.estInscrit(app.user) ? 'Oui' : 'Non' }}</td>
+				<td>
+					<a href="{{ path('profil_consulter', {'id': sortie.organisateur.id}) }}">
+						{{ sortie.organisateur.pseudo }}
+					</a>
+				</td>
+				<td>
+					<a href="{{ path('sortie_details', {'id': sortie.id}) }}" class="btn btn-info btn-sm">Détails</a>
+					<a href="{{ path('sortie_modifier', {'id': sortie.id}) }}" class="btn btn-primary btn-sm">Modifier</a>
+
+					{% if sortie.etat.value == 'Ouverte' %}
+						{# Admin peut s’inscrire à une sortie ouverte #}
+						{% set inscriptionPossible = sortie.dateLimiteInscription > "now"|date('Y-m-d H:i')
+							and (sortie.nbInscriptionMax > sortie.participants|length or sortie.nbInscriptionMax is null) %}
+
+						{% if not sortie.estInscrit(app.user) and inscriptionPossible %}
+							<form action="{{ path('sortie_inscrire', {'id': sortie.id}) }}" method="post" style="display:inline;">
+								<button type="submit" class="btn btn-success btn-sm">S'inscrire</button>
+							</form>
+						{% elseif sortie.estInscrit(app.user) and sortie.dateHeureDebut > "now"|date('Y-m-d H:i') %}
+							<form action="{{ path('sortie_desister', {'id': sortie.id}) }}" method="post" style="display:inline;">
+								<button type="submit" class="btn btn-warning btn-sm">Se désister</button>
+							</form>
+						{% endif %}
+					{% endif %}
+					{% if sortie.etat.value == 'Ouverte' or sortie.etat.value == 'En création' %}
+						<button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#modal-annuler-{{ sortie.id }}">
+							Annuler
+						</button>
+					{% endif %}
+				</td>
+			</tr>
+			{# Modal d'annulation pour chaque sortie #}
+			<div class="modal fade" id="modal-annuler-{{ sortie.id }}" tabindex="-1" aria-labelledby="modalLabel{{ sortie.id }}" aria-hidden="true">
+				<div class="modal-dialog">
+					<div class="modal-content bg-dark text-light">
+						<div class="modal-header">
+							<h5 class="modal-title" id="modalLabel{{ sortie.id }}">Annuler la sortie : {{ sortie.nom }}</h5>
+							<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fermer"></button>
+						</div>
+						<div class="modal-body">
+							<form method="post" action="{{ path('sortie_annuler', {'id': sortie.id}) }}">
+								<input type="hidden" name="_token" value="{{ csrf_token('annuler_sortie_' ~ sortie.id) }}">
+								<div class="mb-3">
+									<label for="motif-{{ sortie.id }}" class="form-label">Veuillez renseigner un motif d'annulation :</label>
+									<textarea class="form-control" id="motif-{{ sortie.id }}" name="motifAnnulation" rows="4" required></textarea>
+								</div>
+								<div class="modal-footer">
+									<button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+									<button type="submit" class="btn btn-danger">Annuler la sortie</button>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		{% else %}
+			<tr>
+				<td colspan="8" class="text-center">Aucune sortie trouvée.</td>
+			</tr>
+		{% endfor %}
+		</tbody>
+	</table>
+
+{% endblock %}
+
+{% block title %}
+Gestion des sorties | Admin
+{% endblock %}
+

@@ -11,7 +11,7 @@
 						<h2 class="mb-0">{{ participant.pseudo }}</h2>
 					</div>
 					{% if participant.filename %}
-						<img src="{{ asset('uploads/images/'~participant.filename) }}" class="card-img-top img-fluid" alt="photo de profil">
+						<img src="{{ asset('uploads/images/'~participant.filename) }}" class="card-img-top img-fluid" alt="photo de {{ participant.pseudo }}">
 					{% endif %}
 					<div class="card-body">
 						<ul class="list-group list-group-flush">
