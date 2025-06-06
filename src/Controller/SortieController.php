@@ -92,11 +92,12 @@ final class SortieController extends AbstractController
 		if ($sortie->getOrganisateur() !== $this->getUser() and !$this->isGranted('ROLE_ADMIN')){
 			throw $this->createAccessDeniedException("Vous n'avez pas le droit de modifier cette sortie");
 		}
-		if ($sortie->getEtat() === Etat::OUVERTE){
-			throw $this->createAccessDeniedException("Une sortie ne peux pas être modifiée une fois publiée");
-		}
+        if ($sortie->getEtat() === Etat::OUVERTE && !$this->isGranted('ROLE_ADMIN')) {
+            throw $this->createAccessDeniedException("Une sortie ne peut pas être modifiée une fois publiée");
+        }
 
-		$lieux  = $lieuRepository->findAll();
+
+        $lieux  = $lieuRepository->findAll();
 		$tabLieux = [];
 		foreach ($lieux as $lieu){
 			$tabLieux[$lieu->getId()] = $lieu;
