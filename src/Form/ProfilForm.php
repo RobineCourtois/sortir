@@ -37,8 +37,8 @@ class ProfilForm extends AbstractType
                         'message' => 'Le mot de passe ne peut pas être vide',
                     ]),
 					new Regex(
-						'/^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=.\-_*])([a-zA-Z0-9@#$%^&+=*.\-_]){3,}$/',
-						"Le mot de passe doit contenir au moins: une majuscule, une minuscule, un nombre et un caractère spécial (@#$%^&+=.)"
+						'/^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=.\-_*])([a-zA-Z0-9@#$%^&+=*.!\-_]){3,}$/',
+						"Le mot de passe doit contenir au moins: une majuscule, une minuscule, un nombre et un caractère spécial (@#$%^&+=.!)"
 					)
                 ],
             ])
